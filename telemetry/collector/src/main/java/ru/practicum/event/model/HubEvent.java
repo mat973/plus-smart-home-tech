@@ -16,7 +16,8 @@ import java.time.Instant;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
-        property = "eventType"
+        property = "type",
+        defaultImpl = HubEvent.class
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ScenarioRemovedEvent.class, name = "SCENARIO_REMOVED"),
