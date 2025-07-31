@@ -1,6 +1,6 @@
 package ru.practicum.event.model.sensor;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,11 +10,11 @@ import ru.practicum.event.model.SensorEvent;
 @Setter
 @ToString(callSuper = true)
 public class ClimateSensorEvent extends SensorEvent {
-    @NotBlank(message = "Уровень температуры по шкале Цельсия не омжет быть пустым")
+    @NotNull(message = "Уровень температуры по шкале Цельсия не омжет быть пустым")
     private Integer temperatureC;
-    @NotBlank(message = "Влажность не может быть пустая")
+    @NotNull(message = "Влажность не может быть пустая")
     private Integer humidity;
-    @NotBlank(message = "Уровень CO2 не может быть пустым")
+    @NotNull(message = "Уровень CO2 не может быть пустым")
     private Integer co2Level;
 
     @Override
