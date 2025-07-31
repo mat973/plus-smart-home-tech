@@ -31,10 +31,8 @@ import java.time.Instant;
 @ToString
 public abstract class SensorEvent {
     @NotBlank(message = "Идентификатор события датчика не может быть пустым")
-    @Positive(message = "Идентификатор события датчика ну может быть отрицательным числом")
     private String id;
     @NotBlank(message = "Идентификатор хаба, связанного с событием не может быть пустым")
-    @Positive(message = "Идентификатор хаба, связанного с событием не может быть отрицательным числом")
     private String hubId;
     private Instant timestamp = Instant.now();
 
