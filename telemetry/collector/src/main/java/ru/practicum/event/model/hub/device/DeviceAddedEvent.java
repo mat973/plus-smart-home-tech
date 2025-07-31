@@ -1,6 +1,7 @@
 package ru.practicum.event.model.hub.device;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,7 +14,7 @@ import ru.practicum.event.model.hub.HubEventType;
 public class DeviceAddedEvent extends HubEvent {
     @NotBlank(message = "Идентификатор добавленного устройства не может быть пустым")
     private String id;
-    @NotBlank(message = "Тип устройства не может быть пустым")
+    @NotNull(message = "Тип устройства не может быть пустым")
     private DeviceType deviceType;
     @Override
     public HubEventType getType() {
