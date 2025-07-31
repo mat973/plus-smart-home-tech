@@ -4,10 +4,10 @@ import org.mapstruct.Mapper;
 import ru.practicum.event.model.SensorEvent;
 import ru.practicum.event.model.sensor.*;
 import ru.yandex.practicum.kafka.telemetry.event.*;
-
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 import java.time.Instant;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = SPRING)
 public interface SensorEventMapper {
 
     ClimateSensorAvro toAvro(ClimateSensorEvent event);

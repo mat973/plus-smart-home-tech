@@ -3,6 +3,7 @@ package ru.practicum.event.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -29,8 +30,11 @@ import java.time.Instant;
 @Setter
 @ToString
 public abstract class SensorEvent {
-    @NotBlank
+    @NotBlank(message = "Идентификатор события датчика не может быть пустым")
+    @Positive(message = "Идентификатор события датчика ну может быть отрицательным числом")
     private String id;
+    @NotBlank(message = "Идентификатор хаба, связанного с событием не может быть пустым")
+    @Positive(message = "Идентификатор хаба, связанного с событием не может быть отрицательным числом")
     private String hubId;
     private Instant timestamp = Instant.now();
 

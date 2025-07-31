@@ -12,7 +12,9 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
 
 import java.time.Instant;
 
-@Mapper(componentModel = "spring")
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+
+@Mapper(componentModel = SPRING)
 public interface HubEventMapper {
 
     @Mapping(target = "type", source = "deviceType")

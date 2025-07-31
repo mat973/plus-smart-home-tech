@@ -2,6 +2,7 @@ package ru.practicum.event.model;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -29,6 +30,7 @@ import java.time.Instant;
 @Setter
 @ToString
 public abstract class HubEvent {
+    @NotBlank(message = "Идентификатор хаба не может быть пустым")
     private String hubId;
     private Instant timestamp = Instant.now();
 
