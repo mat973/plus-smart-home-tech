@@ -1,4 +1,4 @@
-package ru.practicum.event.mupstruct;
+package ru.practicum.event.mapstruct;
 
 import org.mapstruct.Mapper;
 import ru.practicum.event.model.SensorEvent;
