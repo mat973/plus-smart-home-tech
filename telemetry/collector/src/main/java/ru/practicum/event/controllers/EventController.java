@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +17,6 @@ import ru.practicum.event.model.HubEvent;
 import ru.practicum.event.model.SensorEvent;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @RestController
@@ -44,15 +41,15 @@ public class EventController {
                 null,
                 timestamp,
                 sensorEvent.getHubId(),
-                avro        );
+                avro);
 
         kafkaProducer.send(record, (metadata, exception) -> {
             if (exception != null) {
-                log.error("Ошибка отправления hub event в Kafka. HubId: {}, Error: {}",
+                log.error("Ошибка отправления sensor event в Kafka. Id: {}, Error: {}",
                         sensorEvent.getId(), exception.getMessage(), exception);
                 throw new KafkaSendException("Отправка sensor event", exception);
             } else {
-                log.info("Успешная отправка hub event. Topic: {}, Partition: {}, Offset: {}",
+                log.info("Успешная отправка sensor event. Topic: {}, Partition: {}, Offset: {}",
                         metadata.topic(), metadata.partition(), metadata.offset());
             }
         });
