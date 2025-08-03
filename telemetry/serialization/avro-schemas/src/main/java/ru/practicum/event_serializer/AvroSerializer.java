@@ -1,4 +1,4 @@
-package event_serializer;
+package ru.practicum.event_serializer;
 
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DatumWriter;

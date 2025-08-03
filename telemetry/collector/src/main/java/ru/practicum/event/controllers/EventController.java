@@ -44,19 +44,18 @@ public class EventController {
                 null,
                 timestamp,
                 sensorEvent.getHubId(),
-                avro
-        );
+                avro        );
 
-        try {
-            RecordMetadata metadata = kafkaProducer.send(record).get();
-            log.info("Успешная отправка sensor event. Topic: {}, Partition: {}, Offset: {}",
-                    metadata.topic(), metadata.partition(), metadata.offset());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Восстанавливаем флаг прерывания
-            throw new KafkaSendException("Отправка sensor event была прервана", e);
-        } catch (ExecutionException e) {
-            throw new KafkaSendException("Ошибка при отправке sensor event в Kafka", e.getCause());
-        }
+        kafkaProducer.send(record, (metadata, exception) -> {
+            if (exception != null) {
+                log.error("Ошибка отправления hub event в Kafka. HubId: {}, Error: {}",
+                        sensorEvent.getId(), exception.getMessage(), exception);
+                throw new KafkaSendException("Отправка sensor event", exception);
+            } else {
+                log.info("Успешная отправка hub event. Topic: {}, Partition: {}, Offset: {}",
+                        metadata.topic(), metadata.partition(), metadata.offset());
+            }
+        });
     }
 
     @PostMapping("/hubs")
@@ -72,16 +71,16 @@ public class EventController {
                 avro
         );
 
-        try {
-            RecordMetadata metadata = kafkaProducer.send(record).get();
-            log.info("Успешная отправка hub event. Topic: {}, Partition: {}, Offset: {}",
-                    metadata.topic(), metadata.partition(), metadata.offset());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new KafkaSendException("Отправка hub event была прервана", e);
-        } catch (ExecutionException e) {
-            throw new KafkaSendException("Ошибка при отправке hub event в Kafka", e.getCause());
-        }
+        kafkaProducer.send(record, (metadata, exception) -> {
+            if (exception != null) {
+                log.error("Ошибка отправления hub event в Kafka. HubId: {}, Error: {}",
+                        hubEvent.getHubId(), exception.getMessage(), exception);
+                throw new KafkaSendException("Отправка hub event", exception);
+            } else {
+                log.info("Успешная отправка hub event. Topic: {}, Partition: {}, Offset: {}",
+                        metadata.topic(), metadata.partition(), metadata.offset());
+            }
+        });
     }
 }
 
