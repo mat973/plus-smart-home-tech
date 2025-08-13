@@ -1,4 +1,4 @@
-package ru.practicum.event.mapstruct;
+package ru.practicum.event.mapper.sensor.mapstruct;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -9,7 +9,7 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import java.time.Instant;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ProtoToJavaMapper {
+public interface SensorProtoToJavaMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "hubId", source = "hubId")

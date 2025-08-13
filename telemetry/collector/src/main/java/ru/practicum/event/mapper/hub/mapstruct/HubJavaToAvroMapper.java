@@ -1,4 +1,4 @@
-package ru.practicum.event.mapstruct;
+package ru.practicum.event.mapper.hub.mapstruct;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,7 +15,7 @@ import java.time.Instant;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING)
-public interface HubEventMapper {
+public interface HubJavaToAvroMapper {
 
     @Mapping(target = "type", source = "deviceType")
     DeviceAddedEventAvro toAvro(DeviceAddedEvent event);

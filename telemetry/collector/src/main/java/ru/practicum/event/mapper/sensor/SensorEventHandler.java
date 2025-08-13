@@ -1,8 +1,10 @@
-package ru.practicum.event.mapper;
+package ru.practicum.event.mapper.sensor;
 
+import ru.practicum.event.model.SensorEvent;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 
 public interface SensorEventHandler {
     SensorEventProto.PayloadCase getMessageType();
-    void handle(SensorEventProto event);
+    SensorEvent toJava(SensorEventProto protoEvent);
 }
+
