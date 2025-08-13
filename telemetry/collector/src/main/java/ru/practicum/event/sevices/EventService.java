@@ -36,10 +36,18 @@ public class EventService {
                 null,
                 timestamp,
                 sensorEvent.getHubId(),
-                avro
-        );
+                avro);
 
-        sendToKafka(record, sensorEvent.getId());
+        kafkaProducer.send(record, (metadata, exception) -> {
+            if (exception != null) {
+                log.error("Ошибка отправления sensor event в Kafka. Id: {}, Error: {}",
+                        sensorEvent.getId(), exception.getMessage(), exception);
+                throw new KafkaSendException("Отправка sensor event", exception);
+            } else {
+                log.info("Успешная отправка sensor event. Topic: {}, Partition: {}, Offset: {}",
+                        metadata.topic(), metadata.partition(), metadata.offset());
+            }
+        });
     }
 
     public void processHub(HubEvent hubEvent) {
@@ -54,7 +62,16 @@ public class EventService {
                 avro
         );
 
-        sendToKafka(record, hubEvent.getHubId());
+        kafkaProducer.send(record, (metadata, exception) -> {
+            if (exception != null) {
+                log.error("Ошибка отправления hub event в Kafka. HubId: {}, Error: {}",
+                        hubEvent.getHubId(), exception.getMessage(), exception);
+                throw new KafkaSendException("Отправка hub event", exception);
+            } else {
+                log.info("Успешная отправка hub event. Topic: {}, Partition: {}, Offset: {}",
+                        metadata.topic(), metadata.partition(), metadata.offset());
+            }
+        });
     }
 
     private void sendToKafka(ProducerRecord<String, SpecificRecordBase> record, String keyInfo) {
