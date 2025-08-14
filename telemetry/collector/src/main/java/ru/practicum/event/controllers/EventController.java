@@ -1,21 +1,21 @@
-package ru.practicum.event.controllers;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.event.exceptions.KafkaSendException;
-import ru.practicum.event.mapper.hub.mapstruct.HubJavaToAvroMapper;
-import ru.practicum.event.model.HubEvent;
-import ru.practicum.event.model.SensorEvent;
-import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+//package ru.practicum.event.controllers;
+//
+//import jakarta.validation.Valid;
+//import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.apache.avro.specific.SpecificRecordBase;
+//import org.apache.kafka.clients.producer.Producer;
+//import org.apache.kafka.clients.producer.ProducerRecord;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RestController;
+//import ru.practicum.event.exceptions.KafkaSendException;
+//import ru.practicum.event.mapper.hub.mapstruct.HubJavaToAvroMapper;
+//import ru.practicum.event.model.HubEvent;
+//import ru.practicum.event.model.SensorEvent;
+//import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+//import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
 //@Slf4j
 //@RestController

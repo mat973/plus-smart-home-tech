@@ -36,12 +36,12 @@ public interface HubEventProtoMapper {
     @Mapping(target = "name", source = "scenarioRemoved.name")
     ScenarioRemovedEvent scenarioRemovedToJava(HubEventProto proto);
 
-    // ===== Маппинг ScenarioConditionProto → ScenarioCondition =====
-    @Mapping(target = "type", source = "type") // тут будет вызван наш default map()
+
+    @Mapping(target = "type", source = "type")
     @Mapping(target = "operation", source = "operation")
     Conditions toJava(ScenarioConditionProto proto);
 
-    // ===== Enum mapping с фильтрацией UNRECOGNIZED =====
+
     default DeviceType map(DeviceTypeProto proto) {
         return proto == null || proto == DeviceTypeProto.UNRECOGNIZED ? null : DeviceType.valueOf(proto.name());
     }
