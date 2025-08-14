@@ -21,7 +21,7 @@ public class ScenarioRemovedEventHandler implements HubEventHandler {
 
     @Override
     public HubEvent toJava(HubEventProto proto) {
-        return mapper.toJava(proto.getScenarioRemoved(), proto);
+        return mapper.scenarioRemovedToJava(proto);
     }
 }
 

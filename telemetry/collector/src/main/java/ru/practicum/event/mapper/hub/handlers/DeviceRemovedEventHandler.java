@@ -18,6 +18,6 @@ public class DeviceRemovedEventHandler implements HubEventHandler {
 
     @Override
     public HubEvent toJava(HubEventProto protoEvent) {
-        return hubProtoToJavaMapper.toJava(protoEvent.getDeviceRemoved(), protoEvent);
+        return hubProtoToJavaMapper.deviceRemovedToJava(protoEvent);
     }
 }

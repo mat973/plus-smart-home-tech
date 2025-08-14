@@ -12,11 +12,11 @@ public class SwitchSensorEventHandler implements SensorEventHandler {
     private final SensorProtoToJavaMapper sensorProtoToJavaMapper;
     @Override
     public SensorEventProto.PayloadCase getMessageType() {
-        return null;
+        return SensorEventProto.PayloadCase.SWITCH_SENSOR_EVENT;
     }
 
     @Override
     public SensorEvent toJava(SensorEventProto protoEvent) {
-        return null;
+        return sensorProtoToJavaMapper.switchToJava(protoEvent);
     }
 }

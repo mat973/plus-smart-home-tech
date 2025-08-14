@@ -20,6 +20,6 @@ public class DeviceAddedEventHandler implements HubEventHandler {
 
     @Override
     public HubEvent toJava(HubEventProto proto) {
-        return mapper.toJava(proto.getDeviceAdded(), proto);
+        return mapper.deviceAddedToJava(proto);
     }
 }

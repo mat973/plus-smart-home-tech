@@ -21,6 +21,6 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
 
     @Override
     public HubEvent toJava(HubEventProto protoEvent) {
-        return hubEventMapper.toJava(protoEvent.getDeviceAdded(), protoEvent);
+        return hubEventMapper.scenarioAddedToJava(protoEvent);
     }
 }
