@@ -7,10 +7,7 @@ import ru.practicum.event.model.hub.device.ConditionType;
 import ru.practicum.event.model.hub.device.DeviceAddedEvent;
 import ru.practicum.event.model.hub.device.DeviceRemoveEvent;
 import ru.practicum.event.model.hub.device.DeviceType;
-import ru.practicum.event.model.hub.scenario.ActionsType;
-import ru.practicum.event.model.hub.scenario.OperationType;
-import ru.practicum.event.model.hub.scenario.ScenarioAddedEvent;
-import ru.practicum.event.model.hub.scenario.ScenarioRemovedEvent;
+import ru.practicum.event.model.hub.scenario.*;
 import ru.yandex.practicum.grpc.telemetry.event.*;
 
 import java.time.Instant;
@@ -32,12 +29,17 @@ public interface HubProtoToJavaMapper {
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioAdded.name")
+    @Mapping(target = "conditions", source = "scenarioAdded.conditionList")
+    @Mapping(target = "actions", source = "scenarioAdded.actionList")
     ScenarioAddedEvent scenarioAddedToJava(HubEventProto proto);
 
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioRemoved.name")
     ScenarioRemovedEvent scenarioRemovedToJava(HubEventProto proto);
+
+    Conditions toJava(ScenarioConditionProto proto);
+    Actions toJava(DeviceActionProto proto);
 
     default DeviceType map(DeviceTypeProto proto) {
         return proto == null || proto == DeviceTypeProto.UNRECOGNIZED
