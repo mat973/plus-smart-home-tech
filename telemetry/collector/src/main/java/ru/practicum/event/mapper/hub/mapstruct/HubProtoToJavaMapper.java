@@ -32,8 +32,8 @@ public interface HubProtoToJavaMapper {
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioAdded.name")
-    @Mapping(target = "conditions", source = "scenarioAdded.conditionList")
-    @Mapping(target = "actions", source = "scenarioAdded.actionList")
+    @Mapping(target = "conditions", source = "scenarioAdded.condition")
+    @Mapping(target = "actions", source = "scenarioAdded.action")
     ScenarioAddedEvent scenarioAddedToJava(HubEventProto proto);
 
     @Mapping(target = "hubId", source = "hubId")
