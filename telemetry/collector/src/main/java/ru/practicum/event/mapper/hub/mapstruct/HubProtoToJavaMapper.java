@@ -15,17 +15,20 @@ import java.time.Instant;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface HubProtoToJavaMapper {
 
+    // ==== DEVICE_ADDED ====
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "id", source = "deviceAdded.id")
     @Mapping(target = "deviceType", source = "deviceAdded.type")
     DeviceAddedEvent deviceAddedToJava(HubEventProto proto);
 
+    // ==== DEVICE_REMOVED ====
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "id", source = "deviceRemoved.id")
     DeviceRemoveEvent deviceRemovedToJava(HubEventProto proto);
 
+    // ==== SCENARIO_ADDED ====
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioAdded.name")
@@ -33,18 +36,21 @@ public interface HubProtoToJavaMapper {
     @Mapping(target = "actions", source = "scenarioAdded.actionList")
     ScenarioAddedEvent scenarioAddedToJava(HubEventProto proto);
 
+    // ==== SCENARIO_REMOVED ====
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioRemoved.name")
     ScenarioRemovedEvent scenarioRemovedToJava(HubEventProto proto);
 
-
+    // ==== Маппинг одного условия ====
     default Conditions toJava(ScenarioConditionProto proto) {
         if (proto == null) return null;
         Conditions c = new Conditions();
         c.setSensorId(proto.getSensorId());
         c.setType(map(proto.getType()));
         c.setOperation(map(proto.getOperation()));
+
+        // oneof: bool_value / int_value
         if (proto.hasBoolValue()) {
             c.setValue(proto.getBoolValue() ? 1 : 0);
         } else if (proto.hasIntValue()) {
@@ -55,6 +61,7 @@ public interface HubProtoToJavaMapper {
         return c;
     }
 
+    // ==== Маппинг одного действия ====
     default Actions toJava(DeviceActionProto proto) {
         if (proto == null) return null;
         Actions a = new Actions();
@@ -64,34 +71,32 @@ public interface HubProtoToJavaMapper {
         return a;
     }
 
-
+    // ==== enum маппинг ====
     default DeviceType map(DeviceTypeProto proto) {
         return proto == null || proto == DeviceTypeProto.UNRECOGNIZED
-                ? null
-                : DeviceType.valueOf(proto.name());
+                ? null : DeviceType.valueOf(proto.name());
     }
 
     default ConditionType map(ConditionTypeProto proto) {
         return proto == null || proto == ConditionTypeProto.UNRECOGNIZED
-                ? null
-                : ConditionType.valueOf(proto.name());
+                ? null : ConditionType.valueOf(proto.name());
     }
 
     default OperationType map(ConditionOperationProto proto) {
         return proto == null || proto == ConditionOperationProto.UNRECOGNIZED
-                ? null
-                : OperationType.valueOf(proto.name());
+                ? null : OperationType.valueOf(proto.name());
     }
 
     default ActionsType map(ActionTypeProto proto) {
         return proto == null || proto == ActionTypeProto.UNRECOGNIZED
-                ? null
-                : ActionsType.valueOf(proto.name());
+                ? null : ActionsType.valueOf(proto.name());
     }
 
+    // ==== timestamp ====
     default Instant toInstant(com.google.protobuf.Timestamp ts) {
         return ts == null ? null : Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
     }
 }
+
 
 
