@@ -1,2 +1,0 @@
-kafka.bootstrap-servers=localhost:9092
-kafka.value-serializer=ru.practicum.event_serializer.AvroSerializer
