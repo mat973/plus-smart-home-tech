@@ -38,8 +38,7 @@ public class AggregationStarter {
                 while (true) {
                     ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(Duration.ofSeconds(1));
                     for (ConsumerRecord<String, SpecificRecordBase> record : records) {
-                        if (record.value() instanceof SensorEventAvro event) {
-                            aggregatorService.aggregate(event).ifPresent(snapshot -> {
+                            aggregatorService.aggregate((SensorEventAvro)record.value()).ifPresent(snapshot -> {
                                 producer.send(new ProducerRecord<>(
                                         SENSOR_SNAPSHOT_TOPIC,
                                         null,
@@ -48,7 +47,7 @@ public class AggregationStarter {
                                         snapshot
                                 ));
                             });
-                        }
+
                     }
                     consumer.commitSync();
                 }
