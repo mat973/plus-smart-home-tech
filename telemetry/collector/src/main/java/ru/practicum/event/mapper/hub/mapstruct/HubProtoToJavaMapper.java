@@ -36,13 +36,13 @@ public interface HubProtoToJavaMapper {
     @Mapping(target = "actions", source = "scenarioAdded.actionList")
     ScenarioAddedEvent scenarioAddedToJava(HubEventProto proto);
 
-    // ==== SCENARIO_REMOVED ====
+
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioRemoved.name")
     ScenarioRemovedEvent scenarioRemovedToJava(HubEventProto proto);
 
-    // ==== Маппинг одного условия ====
+
     default Conditions toJava(ScenarioConditionProto proto) {
         if (proto == null) return null;
         Conditions c = new Conditions();
@@ -50,7 +50,7 @@ public interface HubProtoToJavaMapper {
         c.setType(map(proto.getType()));
         c.setOperation(map(proto.getOperation()));
 
-        // oneof: bool_value / int_value
+
         if (proto.hasBoolValue()) {
             c.setValue(proto.getBoolValue() ? 1 : 0);
         } else if (proto.hasIntValue()) {
@@ -61,7 +61,7 @@ public interface HubProtoToJavaMapper {
         return c;
     }
 
-    // ==== Маппинг одного действия ====
+
     default Actions toJava(DeviceActionProto proto) {
         if (proto == null) return null;
         Actions a = new Actions();
@@ -71,7 +71,7 @@ public interface HubProtoToJavaMapper {
         return a;
     }
 
-    // ==== enum маппинг ====
+
     default DeviceType map(DeviceTypeProto proto) {
         return proto == null || proto == DeviceTypeProto.UNRECOGNIZED
                 ? null : DeviceType.valueOf(proto.name());
@@ -92,7 +92,7 @@ public interface HubProtoToJavaMapper {
                 ? null : ActionsType.valueOf(proto.name());
     }
 
-    // ==== timestamp ====
+
     default Instant toInstant(com.google.protobuf.Timestamp ts) {
         return ts == null ? null : Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
     }

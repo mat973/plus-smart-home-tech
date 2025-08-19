@@ -74,18 +74,6 @@ public class EventService {
         });
     }
 
-    private void sendToKafka(ProducerRecord<String, SpecificRecordBase> record, String keyInfo) {
-        kafkaProducer.send(record, (metadata, exception) -> {
-            if (exception != null) {
-                log.error("Ошибка отправления события в Kafka. Key: {}, Error: {}",
-                        keyInfo, exception.getMessage(), exception);
-                throw new KafkaSendException("Отправка события", exception);
-            } else {
-                log.info("Успешная отправка события. Topic: {}, Partition: {}, Offset: {}",
-                        metadata.topic(), metadata.partition(), metadata.offset());
-            }
-        });
-    }
 }
 
 
