@@ -14,10 +14,10 @@ protocol SensorsSnapshotProtocol {
   // схема состояния датчика
     record SensorStateAvro {
         timestamp_ms timestamp;  // время отправки показаний
-        union {                  // показания конкретного датчика
+        union {                  // показания конкретного датчика   3 - 2
             ClimateSensorAvro,
-            LightSensorAvro,
             MotionSensorAvro,
+            LightSensorAvro,
             SwitchSensorAvro,
             TemperatureSensorAvro
         } data;
