@@ -16,8 +16,8 @@ protocol SensorsSnapshotProtocol {
         timestamp_ms timestamp;  // время отправки показаний
         union {                  // показания конкретного датчика   3 - 2
             ClimateSensorAvro,
-            MotionSensorAvro,
             LightSensorAvro,
+            MotionSensorAvro,
             SwitchSensorAvro,
             TemperatureSensorAvro
         } data;
