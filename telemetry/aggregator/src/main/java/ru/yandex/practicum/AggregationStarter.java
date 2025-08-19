@@ -22,7 +22,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class AggregationStarter {
-    private static final String HUB_TOPIC = "telemetry.hubs.v1";
     private static final String SENSOR_TOPIC = "telemetry.sensors.v1";
     private static final String SENSOR_SNAPSHOT_TOPIC = "telemetry.snapshots.v1";
 
@@ -32,7 +31,7 @@ public class AggregationStarter {
 
     @PostConstruct
     public void start() {
-        consumer.subscribe(List.of(HUB_TOPIC, SENSOR_TOPIC));
+        consumer.subscribe(List.of(SENSOR_TOPIC));
 
         Thread thread = new Thread(() -> {
             try {
