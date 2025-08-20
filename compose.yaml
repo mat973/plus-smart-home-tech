@@ -1,4 +1,5 @@
 services:
+
   kafka:
     image: confluentinc/confluent-local:7.4.3
     hostname: kafka
@@ -33,3 +34,20 @@ services:
                              --partitions 1 --replication-factor 1 --if-not-exists \
                              --bootstrap-server kafka:29092'"
     init: true
+
+  postgres:
+    image: postgres:15
+    container_name: analyzer-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: analyzer
+      POSTGRES_USER: analyzer
+      POSTGRES_PASSWORD: analyzer
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - analyzer_pgdata:/var/lib/postgresql/data
+
+volumes:
+  analyzer_pgdata:
