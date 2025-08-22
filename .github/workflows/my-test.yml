@@ -34,7 +34,7 @@ jobs:
   show-logs:
     needs: run-tests
     runs-on: ubuntu-latest
-    if: ${{ inputs.print_logs == 'true' }}
+    if: ${{ always() && inputs.print_logs == 'true' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
