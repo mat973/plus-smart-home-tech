@@ -30,3 +30,16 @@ jobs:
     with:
       verbose_mode: ${{ inputs.verbose_mode }}
       print_logs: ${{ inputs.print_logs }}
+
+    steps:
+      - name: Show Analyzer logs
+        if: ${{ inputs.print_logs == 'true' }}
+        run: |
+          echo "===== Analyzer Logs ====="
+          cat ./logs/analyzer.log || echo "Analyzer log not found"
+
+      - name: Show Hub Router logs
+        if: ${{ inputs.print_logs == 'true' }}
+        run: |
+          echo "===== Hub Router Logs ====="
+          cat ./logs/hub-router.log || echo "Hub Router log not found"
