@@ -22,45 +22,35 @@ import java.util.Properties;
 public class KafkaConfig {
 
     private String bootstrapServers;
-
-    @Value("${analyzer.kafka.hub.value-deserializer}")
     private String hubValueDeserializer;
-
-    @Value("${analyzer.kafka.snapshot.value-deserializer}")
     private String snapshotValueDeserializer;
-
-    @Value("${analyzer.kafka.hub.group-id}")
-    private String groupHubEvents;
-
-    @Value("${analyzer.kafka.snapshot.group-id}")
-    private String groupSnapshots;
-
+    private String hubGroupId;
+    private String snapshotGroupId;
     private int pollTimeoutMs;
-
 
     @Bean
     public Consumer<String, HubEventAvro> hubEventsConsumer() {
         Properties props = new Properties();
-        props.put("bootstrap.servers", bootstrapServers);
-        props.put("key.deserializer", StringDeserializer.class.getName());
-        props.put("value.deserializer", hubValueDeserializer);
-        props.put("group.id", groupHubEvents);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, hubValueDeserializer);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, hubGroupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put("enable.auto.commit", "true");
-        props.put("max.poll.records", 200);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 200);
         return new KafkaConsumer<>(props);
     }
 
     @Bean
     public Consumer<String, SensorsSnapshotAvro> snapshotsConsumer() {
         Properties props = new Properties();
-        props.put("bootstrap.servers", bootstrapServers);
-        props.put("key.deserializer", StringDeserializer.class.getName());
-        props.put("value.deserializer", snapshotValueDeserializer);
-        props.put("group.id", groupSnapshots);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, snapshotValueDeserializer);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, snapshotGroupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put("enable.auto.commit", "false");
-        props.put("max.poll.records", 50);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 50);
         return new KafkaConsumer<>(props);
     }
 }
