@@ -2,82 +2,79 @@ package ru.yandex.practicum.evaluator;
 
 import com.google.protobuf.util.Timestamps;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.client.HubRouterClient;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
-import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
-import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import ru.yandex.practicum.model.*;
+import ru.yandex.practicum.model.ActionType;
+import ru.yandex.practicum.model.ConditionType;
+import ru.yandex.practicum.model.Operation;
+import ru.yandex.practicum.model.Scenario;
+import ru.yandex.practicum.repository.ScenarioActionRepository;
+import ru.yandex.practicum.repository.ScenarioConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
-import ru.yandex.practicum.repository.SensorRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class ScenarioEvaluator {
 
     private final ScenarioRepository scenarioRepository;
-    private final SensorRepository sensorRepository;
+    private final ScenarioConditionRepository scenarioConditionRepository;
+    private final ScenarioActionRepository scenarioActionRepository;
     private final EvaluatorRegistry registry;
-    private final HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient;
+    private final HubRouterClient hubRouterClient;
 
-    public void evaluate(SensorsSnapshotAvro snapshot) {
-        // Загружаем сценарии для конкретного hubId
+    public void evaluateSnapshot(SensorsSnapshotAvro snapshot) {
         List<Scenario> scenarios = scenarioRepository.findByHubId(snapshot.getHubId());
 
-        scenarios.stream()
-                .filter(scenario -> checkAllConditions(scenario, snapshot))
-                .forEach(scenario -> executeActions(scenario, snapshot));
-    }
+        for (Scenario scenario : scenarios) {
+            var scenarioConditions = scenarioConditionRepository.findByScenarioId(scenario.getId());
 
-    /**
-     * Проверяем все условия сценария
-     */
-    private boolean checkAllConditions(Scenario scenario, SensorsSnapshotAvro snapshot) {
-        return scenario.getConditions().stream().allMatch(cond -> {
-            // Находим состояние сенсора по id
-            Sensor sensor = sensorRepository.findByIdAndHubId(cond.getId().toString(), scenario.getHubId())
-                    .orElse(null);
-            if (sensor == null) return false;
+            boolean conditionsOk = scenarioConditions.stream()
+                    .allMatch(sc -> {
+                        var sensorId = sc.getSensor().getId();
+                        var state = snapshot.getSensorsState().get(sensorId);
+                        if (state == null) return false;
 
-            SensorStateAvro sensorState = snapshot.getSensorsState().get(sensor.getId());
-            if (sensorState == null) return false;
+                        return registry.extractValue(
+                                        ConditionType.valueOf(sc.getCondition().getType()),
+                                        state
+                                )
+                                .map(val -> registry.compare(
+                                        Operation.valueOf(sc.getCondition().getOperation()),
+                                        val,
+                                        BigDecimal.valueOf(sc.getCondition().getValue())
+                                ))
+                                .orElse(false);
+                    });
 
-            ConditionType type = ConditionType.valueOf(cond.getType());
-            Operation op = Operation.valueOf(cond.getOperation());
+            if (conditionsOk) {
+                // достаём Actions вместе с sensorId
+                var scenarioActions = scenarioActionRepository.findByScenarioId(scenario.getId());
 
-            return registry.extractValue(type, sensorState)
-                    .map(actual -> registry.compare(op, actual, BigDecimal.valueOf(cond.getValue())))
-                    .orElse(false);
-        });
-    }
+                scenarioActions.forEach(sa -> {
+                    var act = sa.getAction();
+                    var sensor = sa.getSensor();
 
-    /**
-     * Выполняем действия сценария (отправляем gRPC команды)
-     */
-    private void executeActions(Scenario scenario, SensorsSnapshotAvro snapshot) {
-        scenario.getActions().forEach(act -> {
-            ActionType type = ActionType.valueOf(act.getType());
+                    var actionProto = registry.buildAction(
+                            ActionType.valueOf(act.getType()),
+                            sensor.getId(),
+                            act.getValue()
+                    );
 
-            DeviceActionProto proto = registry.buildAction(
-                    type,
-                    act.getId().toString(),   // ⚠️ тут лучше будет связка через sensor_id из связующей таблицы
-                    Optional.ofNullable(act.getValue()).orElse(0)
-            );
+                    var request = DeviceActionRequest.newBuilder()
+                            .setHubId(scenario.getHubId())
+                            .setScenarioName(scenario.getName())
+                            .setAction(actionProto)
+                            .setTimestamp(Timestamps.fromMillis(snapshot.getTimestamp().toEpochMilli()))
+                            .build();
 
-            DeviceActionRequest request = DeviceActionRequest.newBuilder()
-                    .setHubId(snapshot.getHubId())
-                    .setScenarioName(scenario.getName())
-                    .setAction(proto)
-                    .setTimestamp(Timestamps.fromMillis(snapshot.getTimestamp().getEpochSecond()))
-                    .build();
-
-            hubRouterClient.handleDeviceAction(request);
-        });
+                    hubRouterClient.sendAction(request);
+                });
+            }
+        }
     }
 }
-

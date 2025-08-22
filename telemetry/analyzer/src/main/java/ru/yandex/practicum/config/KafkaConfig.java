@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +21,19 @@ import java.util.Properties;
 public class KafkaConfig {
 
     private String bootstrapServers;
+
+    @Value("${analyzer.kafka.hub.value-deserializer}")
     private String hubValueDeserializer;
+
+    @Value("${analyzer.kafka.snapshot.value-deserializer}")
     private String snapshotValueDeserializer;
+
+    @Value("${analyzer.kafka.hub.group-id}")
     private String groupHubEvents;
+
+    @Value("${analyzer.kafka.snapshot.group-id}")
     private String groupSnapshots;
+
     private int pollTimeoutMs;
 
 
