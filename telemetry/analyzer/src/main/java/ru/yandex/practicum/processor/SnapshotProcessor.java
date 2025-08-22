@@ -27,16 +27,20 @@ public class SnapshotProcessor {
         try {
             while (running) {
                 var records = snapshotsConsumer.poll(Duration.ofMillis(1000));
+                for (var record : records) {
+                    try {
+                        SensorsSnapshotAvro snapshot = record.value();
+                        log.info("Получен снапшот от хаба [{}]: {}", snapshot.getHubId(), snapshot);
 
-                records.forEach(record -> {
-                    SensorsSnapshotAvro snapshot = record.value();
-                    log.info("Получен снапшот от хаба [{}]: {}", snapshot.getHubId(), snapshot);
+                        scenarioEvaluator.evaluateSnapshot(snapshot);
 
-                    // Оцениваем сценарии и выполняем действия
-                    scenarioEvaluator.evaluateSnapshot(snapshot);
-                });
-
-                snapshotsConsumer.commitSync(); // ручной коммит смещений
+                    } catch (Exception e) {
+                        log.error("Ошибка при обработке снапшота: {}", record, e);
+                    }
+                }
+                if (!records.isEmpty()) {
+                    snapshotsConsumer.commitSync();
+                }
             }
         } catch (WakeupException e) {
             log.info("SnapshotProcessor wakeup: {}", e.getMessage());
