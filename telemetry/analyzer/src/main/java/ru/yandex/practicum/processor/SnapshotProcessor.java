@@ -4,6 +4,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,24 +13,30 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Properties;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SnapshotProcessor {
+public class SnapshotProcessor implements Runnable {
 
     @Value("${topic.snapshots}")
     private String snapshotsTopic;
-    private final ScenarioEvaluator scenarioEvaluator;
-    private final Consumer<String, SensorsSnapshotAvro> snapshotsConsumer;
-    private volatile boolean running = true;
 
-    public void start() {
-        snapshotsConsumer.subscribe(List.of(snapshotsTopic));
+    private final ScenarioEvaluator scenarioEvaluator;
+    private final Properties snapshotConsumerProps;
+
+    private volatile boolean running = true;
+    private Consumer<String, SensorsSnapshotAvro> consumer;
+
+    @Override
+    public void run() {
+        consumer = new KafkaConsumer<>(snapshotConsumerProps);
+        consumer.subscribe(List.of(snapshotsTopic));
 
         try {
             while (running) {
-                var records = snapshotsConsumer.poll(Duration.ofMillis(1000));
+                var records = consumer.poll(Duration.ofMillis(1000));
                 for (var record : records) {
                     try {
                         SensorsSnapshotAvro snapshot = record.value();
@@ -42,13 +49,13 @@ public class SnapshotProcessor {
                     }
                 }
                 if (!records.isEmpty()) {
-                    snapshotsConsumer.commitSync();
+                    consumer.commitSync();
                 }
             }
         } catch (WakeupException e) {
             log.info("SnapshotProcessor wakeup: {}", e.getMessage());
         } finally {
-            snapshotsConsumer.close();
+            consumer.close();
             log.info("SnapshotProcessor корректно завершён");
         }
     }
@@ -57,7 +64,10 @@ public class SnapshotProcessor {
     public void shutdown() {
         log.info("Останавливаем SnapshotProcessor...");
         running = false;
-        snapshotsConsumer.wakeup();
+        if (consumer != null) {
+            consumer.wakeup();
+        }
     }
 }
+
 
