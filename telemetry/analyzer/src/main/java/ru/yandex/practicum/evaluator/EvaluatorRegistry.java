@@ -1,5 +1,6 @@
 package ru.yandex.practicum.evaluator;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
@@ -9,6 +10,7 @@ import ru.yandex.practicum.model.ConditionType;
 import ru.yandex.practicum.model.Operation;
 
 import java.math.BigDecimal;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -16,8 +18,12 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class EvaluatorRegistry {
 
+    /**
+     * ConditionType → как достать значение из SensorStateAvro
+     */
     private final Map<ConditionType, Function<SensorStateAvro, Optional<BigDecimal>>> extractors =
             Map.of(
                     ConditionType.TEMPERATURE, st -> {
@@ -59,41 +65,48 @@ public class EvaluatorRegistry {
                             return Optional.of(sw.getState() ? BigDecimal.ONE : BigDecimal.ZERO);
                         }
                         return Optional.empty();
-                    },
-                    ConditionType.UNKNOWN, st -> Optional.empty()
+                    }
             );
 
+    /**
+     * Operation → предикат сравнения
+     */
     private final Map<Operation, BiPredicate<BigDecimal, BigDecimal>> comparators =
             Map.of(
                     Operation.GREATER_THAN, (a, b) -> a.compareTo(b) > 0,
-                    Operation.LOWER_THAN,   (a, b) -> a.compareTo(b) < 0,
-                    Operation.EQUALS,       BigDecimal::equals
+                    Operation.LOWER_THAN, (a, b) -> a.compareTo(b) < 0,
+                    Operation.EQUALS, (a, b) -> a.compareTo(b) == 0
             );
 
-    // Как собирать gRPC действие
+    /**
+     * ActionType → сборка DeviceActionProto
+     */
     private final Map<ActionType, BiFunction<String, Integer, DeviceActionProto>> actionBuilders =
             Map.of(
-                    ActionType.SET_VALUE,  (sensorId, v) -> DeviceActionProto.newBuilder()
-                            .setSensorId(sensorId)
-                            .setType(ActionTypeProto.SET_VALUE)
-                            .setValue(v).build(),
-                    ActionType.ACTIVATE,   (sensorId, v) -> DeviceActionProto.newBuilder()
-                            .setSensorId(sensorId)
-                            .setType(ActionTypeProto.ACTIVATE)
-                            .setValue(1).build(),
-                    ActionType.DEACTIVATE, (sensorId, v) -> DeviceActionProto.newBuilder()
-                            .setSensorId(sensorId)
-                            .setType(ActionTypeProto.DEACTIVATE)
-                            .setValue(0).build(),
-                    ActionType.INVERSE,    (sensorId, v) -> DeviceActionProto.newBuilder()
-                            .setSensorId(sensorId)
-                            .setType(ActionTypeProto.INVERSE)
-                            .build(),
-                    ActionType.NOOP,       (sensorId, v) -> DeviceActionProto.newBuilder()
-                            .setSensorId(sensorId)
-                            .setType(ActionTypeProto.UNRECOGNIZED)
-                            .build()
+                    ActionType.ACTIVATE, (sensorId, value) ->
+                            DeviceActionProto.newBuilder()
+                                    .setSensorId(sensorId)
+                                    .setType(ActionTypeProto.ACTIVATE)
+                                    .build(),
+                    ActionType.DEACTIVATE, (sensorId, value) ->
+                            DeviceActionProto.newBuilder()
+                                    .setSensorId(sensorId)
+                                    .setType(ActionTypeProto.DEACTIVATE)
+                                    .build(),
+                    ActionType.INVERSE, (sensorId, value) ->
+                            DeviceActionProto.newBuilder()
+                                    .setSensorId(sensorId)
+                                    .setType(ActionTypeProto.INVERSE)
+                                    .build(),
+                    ActionType.SET_VALUE, (sensorId, value) ->
+                            DeviceActionProto.newBuilder()
+                                    .setSensorId(sensorId)
+                                    .setType(ActionTypeProto.SET_VALUE)
+                                    .setValue(value)
+                                    .build()
             );
+
+    // --- Публичные методы ---
 
     public Optional<BigDecimal> extractValue(ConditionType type, SensorStateAvro state) {
         return extractors.getOrDefault(type, st -> Optional.empty()).apply(state);
@@ -104,8 +117,10 @@ public class EvaluatorRegistry {
     }
 
     public DeviceActionProto buildAction(ActionType type, String sensorId, Integer value) {
-        return actionBuilders.getOrDefault(type, (id, v) -> DeviceActionProto.getDefaultInstance())
+        return actionBuilders.getOrDefault(type,
+                        (id, v) -> DeviceActionProto.getDefaultInstance())
                 .apply(sensorId, value);
     }
 }
+
 

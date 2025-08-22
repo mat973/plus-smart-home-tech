@@ -16,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SnapshotProcessor {
 
+    private final ScenarioEvaluator scenarioEvaluator;
     private final Consumer<String, SensorsSnapshotAvro> snapshotsConsumer;
     private volatile boolean running = true;
 
@@ -25,16 +26,16 @@ public class SnapshotProcessor {
         try {
             while (running) {
                 var records = snapshotsConsumer.poll(Duration.ofMillis(1000));
+
                 records.forEach(record -> {
                     SensorsSnapshotAvro snapshot = record.value();
                     log.info("Получен снапшот от хаба [{}]: {}", snapshot.getHubId(), snapshot);
 
-                    // TODO: проверить условия сценариев для этого хаба
-                    // TODO: при совпадении условий - отослать действия (через gRPC клиент)
+                    // Оцениваем сценарии и выполняем действия
+                    scenarioEvaluator.evaluateSnapshot(snapshot);
                 });
 
-                // ручной коммит смещений
-                snapshotsConsumer.commitSync();
+                snapshotsConsumer.commitSync(); // ручной коммит смещений
             }
         } catch (WakeupException e) {
             log.info("SnapshotProcessor wakeup: {}", e.getMessage());
@@ -48,6 +49,7 @@ public class SnapshotProcessor {
     public void shutdown() {
         log.info("Останавливаем SnapshotProcessor...");
         running = false;
-        snapshotsConsumer.wakeup(); // прервать poll()
+        snapshotsConsumer.wakeup();
     }
 }
+

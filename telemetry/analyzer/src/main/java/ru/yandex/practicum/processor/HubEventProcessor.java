@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.service.HubEventService;
 
 import java.time.Duration;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public class HubEventProcessor implements Runnable {
 
     private final Consumer<String, HubEventAvro> hubEventsConsumer;
+    private final HubEventService hubEventService;
     private volatile boolean running = true;
 
     @Override
@@ -26,12 +28,12 @@ public class HubEventProcessor implements Runnable {
         try {
             while (running) {
                 var records = hubEventsConsumer.poll(Duration.ofMillis(1000));
+
                 records.forEach(record -> {
                     HubEventAvro event = record.value();
                     log.info("Получено событие от хаба [{}]: {}", event.getHubId(), event);
 
-                    // TODO: сохранить устройства/сценарии в БД через репозитории
-                    // TODO: при необходимости вызвать сервис для отсылки дальше (gRPC клиент)
+                    hubEventService.handleEvent(event);
                 });
             }
         } catch (WakeupException e) {
@@ -46,6 +48,6 @@ public class HubEventProcessor implements Runnable {
     public void shutdown() {
         log.info("Останавливаем HubEventProcessor...");
         running = false;
-        hubEventsConsumer.wakeup(); // прервать poll()
+        hubEventsConsumer.wakeup();
     }
 }
