@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.evaluator.ScenarioEvaluator;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
@@ -17,12 +18,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SnapshotProcessor {
 
+    @Value("${topic.snapshots-topic}")
+    private String snapshotsTopic;
     private final ScenarioEvaluator scenarioEvaluator;
     private final Consumer<String, SensorsSnapshotAvro> snapshotsConsumer;
     private volatile boolean running = true;
 
     public void start() {
-        snapshotsConsumer.subscribe(List.of("telemetry.snapshots.v1"));
+        snapshotsConsumer.subscribe(List.of(snapshotsTopic));
 
         try {
             while (running) {

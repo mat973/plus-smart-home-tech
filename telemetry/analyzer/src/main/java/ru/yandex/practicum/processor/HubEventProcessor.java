@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.service.HubEventService;
@@ -17,13 +18,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HubEventProcessor implements Runnable {
 
+    @Value("${topic.hub-event-topic}")
+    private String hubEventsTopic;
     private final Consumer<String, HubEventAvro> hubEventsConsumer;
     private final HubEventService hubEventService;
     private volatile boolean running = true;
 
     @Override
     public void run() {
-        hubEventsConsumer.subscribe(List.of("telemetry.hubs.v1"));
+        hubEventsConsumer.subscribe(List.of(hubEventsTopic));
 
         try {
             while (running) {
