@@ -1,0 +1,50 @@
+name: Smart Home Tech Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      verbose_mode:
+        description: "Включить подробные логи во время тестов"
+        required: false
+        default: false
+        type: boolean
+      print_logs:
+        description: "Включить вывод логов в консоль"
+        required: false
+        default: false
+        type: boolean
+  pull_request:
+    inputs:
+      verbose_mode:
+        required: false
+        type: string
+        default: "false"
+      print_logs:
+        required: false
+        type: string
+        default: "false"
+
+jobs:
+  run-tests:
+    uses: yandex-praktikum/plus-smart-home-tech/.github/workflows/api-tests.yml@ci
+    with:
+      verbose_mode: ${{ inputs.verbose_mode }}
+      print_logs: ${{ inputs.print_logs }}
+
+  show-logs:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    if: ${{ inputs.print_logs == 'true' }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Show Analyzer Logs
+        run: |
+          echo "===== Analyzer Logs ====="
+          cat ./logs/analyzer.log || echo "Analyzer log not found"
+
+      - name: Show Hub Router Logs
+        run: |
+          echo "===== Hub Router Logs ====="
+          cat ./logs/hub-router.log || echo "Hub Router log not found"
