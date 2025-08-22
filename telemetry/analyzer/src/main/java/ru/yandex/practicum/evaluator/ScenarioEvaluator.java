@@ -52,7 +52,6 @@ public class ScenarioEvaluator {
                     });
 
             if (conditionsOk) {
-                // достаём Actions вместе с sensorId
                 var scenarioActions = scenarioActionRepository.findByScenarioId(scenario.getId());
 
                 scenarioActions.forEach(sa -> {

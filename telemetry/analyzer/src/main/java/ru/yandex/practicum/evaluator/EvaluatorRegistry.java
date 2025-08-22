@@ -21,9 +21,6 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class EvaluatorRegistry {
 
-    /**
-     * ConditionType → как достать значение из SensorStateAvro
-     */
     private final Map<ConditionType, Function<SensorStateAvro, Optional<BigDecimal>>> extractors =
             Map.of(
                     ConditionType.TEMPERATURE, st -> {
@@ -68,9 +65,6 @@ public class EvaluatorRegistry {
                     }
             );
 
-    /**
-     * Operation → предикат сравнения
-     */
     private final Map<Operation, BiPredicate<BigDecimal, BigDecimal>> comparators =
             Map.of(
                     Operation.GREATER_THAN, (a, b) -> a.compareTo(b) > 0,
@@ -78,9 +72,7 @@ public class EvaluatorRegistry {
                     Operation.EQUALS, (a, b) -> a.compareTo(b) == 0
             );
 
-    /**
-     * ActionType → сборка DeviceActionProto
-     */
+
     private final Map<ActionType, BiFunction<String, Integer, DeviceActionProto>> actionBuilders =
             Map.of(
                     ActionType.ACTIVATE, (sensorId, value) ->
@@ -106,7 +98,7 @@ public class EvaluatorRegistry {
                                     .build()
             );
 
-    // --- Публичные методы ---
+
 
     public Optional<BigDecimal> extractValue(ConditionType type, SensorStateAvro state) {
         return extractors.getOrDefault(type, st -> Optional.empty()).apply(state);
