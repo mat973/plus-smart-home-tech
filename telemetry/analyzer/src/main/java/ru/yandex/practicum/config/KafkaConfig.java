@@ -3,6 +3,7 @@ package ru.yandex.practicum.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +45,7 @@ public class KafkaConfig {
         props.put("key.deserializer", StringDeserializer.class.getName());
         props.put("value.deserializer", hubValueDeserializer);
         props.put("group.id", groupHubEvents);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put("enable.auto.commit", "true");
         props.put("max.poll.records", 200);
         return new KafkaConsumer<>(props);
@@ -56,6 +58,7 @@ public class KafkaConfig {
         props.put("key.deserializer", StringDeserializer.class.getName());
         props.put("value.deserializer", snapshotValueDeserializer);
         props.put("group.id", groupSnapshots);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put("enable.auto.commit", "false");
         props.put("max.poll.records", 50);
         return new KafkaConsumer<>(props);
