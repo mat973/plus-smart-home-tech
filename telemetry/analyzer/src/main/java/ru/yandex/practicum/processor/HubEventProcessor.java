@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HubEventProcessor implements Runnable {
 
-    @Value("${topic.hub-event-topic}")
+    @Value("${topic.hub-events}")
     private String hubEventsTopic;
     private final Consumer<String, HubEventAvro> hubEventsConsumer;
     private final HubEventService hubEventService;

@@ -44,7 +44,7 @@ services:
       POSTGRES_USER: analyzer
       POSTGRES_PASSWORD: analyzer
     ports:
-      - "5433:5432"
+      - "5439:5432"
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
       - analyzer_pgdata:/var/lib/postgresql/data

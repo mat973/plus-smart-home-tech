@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SnapshotProcessor {
 
-    @Value("${topic.snapshots-topic}")
+    @Value("${topic.snapshots}")
     private String snapshotsTopic;
     private final ScenarioEvaluator scenarioEvaluator;
     private final Consumer<String, SensorsSnapshotAvro> snapshotsConsumer;
