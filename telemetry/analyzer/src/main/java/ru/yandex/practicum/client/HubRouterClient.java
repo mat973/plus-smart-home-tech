@@ -12,6 +12,7 @@ import com.google.protobuf.Empty;
 @RequiredArgsConstructor
 public class HubRouterClient {
 
+
     @GrpcClient("hub-router")
     private HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterStub;
 
