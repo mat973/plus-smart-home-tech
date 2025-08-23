@@ -47,10 +47,20 @@ public class HubEventService {
     }
 
     private void handleScenarioAdded(String hubId, ScenarioAddedEventAvro scenarioAdded) {
-        var scenario = new Scenario();
-        scenario.setHubId(hubId);
-        scenario.setName(scenarioAdded.getName());
+        var scenario = scenarioRepository.findByHubIdAndName(hubId, scenarioAdded.getName())
+                .orElseGet(() -> {
+                    var newScenario = new Scenario();
+                    newScenario.setHubId(hubId);
+                    newScenario.setName(scenarioAdded.getName());
+                    return newScenario;
+                });
         scenario = scenarioRepository.save(scenario);
+
+        var oldConditions = scenarioConditionRepository.findByScenarioId(scenario.getId());
+        scenarioConditionRepository.deleteAll(oldConditions);
+
+        var oldActions = scenarioActionRepository.findByScenarioId(scenario.getId());
+        scenarioActionRepository.deleteAll(oldActions);
 
         for (ScenarioConditionAvro condAvro : scenarioAdded.getConditions()) {
             var cond = new Condition();

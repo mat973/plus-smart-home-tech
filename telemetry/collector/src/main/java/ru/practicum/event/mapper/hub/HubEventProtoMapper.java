@@ -19,6 +19,7 @@ public class HubEventProtoMapper {
             case SCENARIO_ADDED -> mapper.scenarioAddedToJava(proto);
             case SCENARIO_REMOVED -> mapper.scenarioRemovedToJava(proto);
             case PAYLOAD_NOT_SET -> throw new IllegalArgumentException("Payload is not set");
+            default -> throw new IllegalArgumentException("Unexpected payload type: " + proto.getPayloadCase());
         };
     }
 }

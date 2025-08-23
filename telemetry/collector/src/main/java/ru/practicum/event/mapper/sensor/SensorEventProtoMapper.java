@@ -20,6 +20,7 @@ public class SensorEventProtoMapper {
             case SWITCH_SENSOR_EVENT -> sensorProtoToJavaMapper.switchToJava(proto);
             case TEMPERATURE_SENSOR_EVENT -> sensorProtoToJavaMapper.temperatureToJava(proto);
             case PAYLOAD_NOT_SET -> throw new IllegalArgumentException("Payload is not set");
+            default -> throw new IllegalArgumentException("Unexpected payload type: " + proto.getPayloadCase());
         };
     }
 }

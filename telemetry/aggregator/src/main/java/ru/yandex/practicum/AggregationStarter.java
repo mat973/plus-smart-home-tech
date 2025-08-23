@@ -37,20 +37,26 @@ public class AggregationStarter {
             try {
                 while (true) {
                     ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(Duration.ofSeconds(1));
-                    for (ConsumerRecord<String, SpecificRecordBase> record : records) {
-                            aggregatorService.aggregate((SensorEventAvro)record.value()).ifPresent(snapshot -> {
-                                producer.send(new ProducerRecord<>(
-                                        SENSOR_SNAPSHOT_TOPIC,
-                                        null,
-                                        snapshot.getTimestamp().toEpochMilli(),
-                                        snapshot.getHubId(),
-                                        snapshot
-                                ));
-                            });
+                    if (!records.isEmpty()) {
+                        try {
+                            for (ConsumerRecord<String, SpecificRecordBase> record : records) {
+                                aggregatorService.aggregate((SensorEventAvro) record.value()).ifPresent(snapshot -> {
+                                    producer.send(new ProducerRecord<>(
+                                            SENSOR_SNAPSHOT_TOPIC,
+                                            null,
+                                            snapshot.getTimestamp().toEpochMilli(),
+                                            snapshot.getHubId(),
+                                            snapshot
+                                    ));
+                                });
 
-                    }
-                    consumer.commitSync();
-                }
+                            }
+                            consumer.commitSync();
+
+                        } catch (Exception e) {
+                            log.error("Ошибка при обработке батча сообщений, оффсеты не зафиксированы", e);
+                        }
+                    }}
             } catch (WakeupException ignored) {
                 log.info("Получен сигнал остановки консьюмера");
             } catch (Exception e) {
@@ -61,9 +67,9 @@ public class AggregationStarter {
                     producer.flush();
                 } finally {
                     log.info("Закрываем консьюмер");
-                    consumer.close();
+                    consumer.close(Duration.ofSeconds(10));
                     log.info("Закрываем продюсер");
-                    producer.close();
+                    producer.close(Duration.ofSeconds(10));
                 }
             }
         }, "aggregation-thread");
