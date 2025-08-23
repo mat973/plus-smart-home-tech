@@ -15,20 +15,20 @@ import java.time.Instant;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface HubProtoToJavaMapper {
 
-    // ==== DEVICE_ADDED ====
+
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "id", source = "deviceAdded.id")
     @Mapping(target = "deviceType", source = "deviceAdded.type")
     DeviceAddedEvent deviceAddedToJava(HubEventProto proto);
 
-    // ==== DEVICE_REMOVED ====
+
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "id", source = "deviceRemoved.id")
     DeviceRemoveEvent deviceRemovedToJava(HubEventProto proto);
 
-    // ==== SCENARIO_ADDED ====
+
     @Mapping(target = "hubId", source = "hubId")
     @Mapping(target = "timestamp", expression = "java(toInstant(proto.getTimestamp()))")
     @Mapping(target = "name", source = "scenarioAdded.name")
