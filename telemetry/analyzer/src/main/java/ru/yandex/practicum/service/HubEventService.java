@@ -47,13 +47,11 @@ public class HubEventService {
     }
 
     private void handleScenarioAdded(String hubId, ScenarioAddedEventAvro scenarioAdded) {
-        // создаём сценарий
         var scenario = new Scenario();
         scenario.setHubId(hubId);
         scenario.setName(scenarioAdded.getName());
         scenario = scenarioRepository.save(scenario);
 
-        // сохраняем условия
         for (ScenarioConditionAvro condAvro : scenarioAdded.getConditions()) {
             var cond = new Condition();
             cond.setType(condAvro.getType().name());
@@ -69,7 +67,6 @@ public class HubEventService {
             scenarioConditionRepository.save(sc);
         }
 
-        // сохраняем действия
         for (DeviceActionAvro actAvro : scenarioAdded.getActions()) {
             var act = new Action();
             act.setType(actAvro.getType().name());

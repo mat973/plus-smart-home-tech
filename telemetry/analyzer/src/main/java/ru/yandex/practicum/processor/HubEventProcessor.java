@@ -9,7 +9,6 @@ import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.service.HubEventService;
 import ru.yandex.practicum.service.HubEventTransactionalService;
 
 import java.time.Duration;
@@ -24,7 +23,7 @@ public class HubEventProcessor implements Runnable {
     @Value("${topic.hub-events}")
     private String hubEventsTopic;
 
-    private final HubEventTransactionalService  hubEventTransactionalService;
+    private final HubEventTransactionalService hubEventTransactionalService;
     private final Properties hubConsumerProps;
 
     private volatile boolean running = true;
