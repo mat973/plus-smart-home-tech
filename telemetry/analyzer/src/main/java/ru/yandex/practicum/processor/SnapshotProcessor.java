@@ -8,8 +8,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.evaluator.ScenarioEvaluator;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+import ru.yandex.practicum.service.SnapshotService;
 
 import java.time.Duration;
 import java.util.List;
@@ -23,7 +23,7 @@ public class SnapshotProcessor implements Runnable {
     @Value("${topic.snapshots}")
     private String snapshotsTopic;
 
-    private final ScenarioEvaluator scenarioEvaluator;
+    private final SnapshotService snapshotService;
     private final Properties snapshotConsumerProps;
 
     private volatile boolean running = true;
@@ -42,7 +42,7 @@ public class SnapshotProcessor implements Runnable {
                         SensorsSnapshotAvro snapshot = record.value();
                         log.info("Получен снапшот от хаба [{}]: {}", snapshot.getHubId(), snapshot);
 
-                        scenarioEvaluator.evaluateSnapshot(snapshot);
+                        snapshotService.processSnapshot(snapshot);
 
                     } catch (Exception e) {
                         log.error("Ошибка при обработке снапшота: {}", record, e);

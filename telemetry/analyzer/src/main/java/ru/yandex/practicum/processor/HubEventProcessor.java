@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.service.HubEventService;
+import ru.yandex.practicum.service.HubEventTransactionalService;
 
 import java.time.Duration;
 import java.util.List;
@@ -23,7 +24,7 @@ public class HubEventProcessor implements Runnable {
     @Value("${topic.hub-events}")
     private String hubEventsTopic;
 
-    private final HubEventService hubEventService;
+    private final HubEventTransactionalService  hubEventTransactionalService;
     private final Properties hubConsumerProps;
 
     private volatile boolean running = true;
@@ -42,7 +43,7 @@ public class HubEventProcessor implements Runnable {
                     HubEventAvro event = record.value();
                     log.info("Получено событие от хаба [{}]: {}", event.getHubId(), event);
 
-                    hubEventService.handleEvent(event);
+                    hubEventTransactionalService.handleEventTransactional(event);
                 });
             }
         } catch (WakeupException e) {
