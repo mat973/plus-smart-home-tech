@@ -14,7 +14,6 @@ import java.util.Properties;
 @Setter
 public class KafkaConfig {
 
-
     @Value("${analyzer.kafka.bootstrapServers}")
     private String bootstrapServers;
 
