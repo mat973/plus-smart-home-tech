@@ -1,13 +1,17 @@
 package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.*;
 import ru.yandex.practicum.repository.*;
 
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HubEventService {
 
     private final SensorRepository sensorRepository;
@@ -41,6 +45,12 @@ public class HubEventService {
                     return sensorRepository.save(newSensor);
                 });
         if (!hubId.equals(sensor.getHubId())) {
+            var oldConditions = scenarioConditionRepository.findBySensorId(device.getId());
+            scenarioConditionRepository.deleteAll(oldConditions);
+
+            var oldActions = scenarioActionRepository.findBySensorId(device.getId());
+            scenarioActionRepository.deleteAll(oldActions);
+            deleteOrphanedScenarios(hubId);
             sensor.setHubId(hubId);
             sensorRepository.save(sensor);
         }
@@ -48,7 +58,17 @@ public class HubEventService {
 
     private void handleDeviceRemoved(String hubId, DeviceRemovedEventAvro device) {
         sensorRepository.findByIdAndHubId(device.getId(), hubId)
-                .ifPresent(sensorRepository::delete);
+                .ifPresent(sensor -> {
+                    var conditions = scenarioConditionRepository.findBySensorId(device.getId());
+                    scenarioConditionRepository.deleteAll(conditions);
+
+                    var actions = scenarioActionRepository.findBySensorId(device.getId());
+                    scenarioActionRepository.deleteAll(actions);
+
+                    deleteOrphanedScenarios(hubId);
+
+                    sensorRepository.delete(sensor);
+                });
     }
 
     private void handleScenarioAdded(String hubId, ScenarioAddedEventAvro scenarioAdded) {
@@ -73,10 +93,8 @@ public class HubEventService {
             cond.setOperation(condAvro.getOperation().name());
             cond.setValue(condAvro.getValue() != null ? (Integer) condAvro.getValue() : null);
             cond = conditionRepository.save(cond);
-
             var sensor = sensorRepository.findByIdAndHubId(condAvro.getSensorId(), hubId)
                     .orElseThrow(() -> new IllegalStateException("Sensor not found for condition"));
-
             var sc = new ScenarioCondition(new ScenarioConditionId(scenario.getId(), sensor.getId(), cond.getId()),
                     scenario, sensor, cond);
             scenarioConditionRepository.save(sc);
@@ -87,10 +105,8 @@ public class HubEventService {
             act.setType(actAvro.getType().name());
             act.setValue(actAvro.getValue() != null ? (Integer) actAvro.getValue() : null);
             act = actionRepository.save(act);
-
             var sensor = sensorRepository.findByIdAndHubId(actAvro.getSensorId(), hubId)
                     .orElseThrow(() -> new IllegalStateException("Sensor not found for action"));
-
             var sa = new ScenarioAction(new ScenarioActionId(scenario.getId(), sensor.getId(), act.getId()),
                     scenario, sensor, act);
             scenarioActionRepository.save(sa);
@@ -99,7 +115,36 @@ public class HubEventService {
 
     private void handleScenarioRemoved(String hubId, ScenarioRemovedEventAvro scenarioRemoved) {
         scenarioRepository.findByHubIdAndName(hubId, scenarioRemoved.getName())
-                .ifPresent(scenarioRepository::delete);
+                .ifPresent(scenario -> {
+                    var conditions = scenarioConditionRepository.findByScenarioId(scenario.getId());
+                    scenarioConditionRepository.deleteAll(conditions);
+                    var actions = scenarioActionRepository.findByScenarioId(scenario.getId());
+                    scenarioActionRepository.deleteAll(actions);
+                    scenarioRepository.delete(scenario);
+                });
+    }
+
+    private void deleteOrphanedScenarios(String hubId) {
+        var scenarios = scenarioRepository.findByHubId(hubId);
+        if (scenarios.isEmpty()) {
+            return;
+        }
+
+        var scenarioIds = scenarios.stream().map(Scenario::getId).collect(Collectors.toList());
+
+        var scenariosWithConditions = scenarioConditionRepository.findExistingScenarioIds(scenarioIds);
+
+        var scenariosWithActions = scenarioActionRepository.findExistingScenarioIds(scenarioIds);
+
+        var orphanedScenarios = scenarios.stream()
+                .filter(scenario -> !scenariosWithConditions.contains(scenario.getId()) &&
+                        !scenariosWithActions.contains(scenario.getId()))
+                .collect(Collectors.toList());
+
+        if (!orphanedScenarios.isEmpty()) {
+            scenarioRepository.deleteAll(orphanedScenarios);
+            log.debug("Deleted {} orphaned scenarios for hub: {}", orphanedScenarios.size(), hubId);
+        }
     }
 }
 
