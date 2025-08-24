@@ -33,9 +33,14 @@ public class HubEventService {
     }
 
     private void handleDeviceAdded(String hubId, DeviceAddedEventAvro device) {
-        if (!sensorRepository.existsById(device.getId())) {
-            var sensor = new Sensor();
-            sensor.setId(device.getId());
+        var sensor = sensorRepository.findById(device.getId())
+                .orElseGet(() -> {
+                    var newSensor = new Sensor();
+                    newSensor.setId(device.getId());
+                    newSensor.setHubId(hubId);
+                    return sensorRepository.save(newSensor);
+                });
+        if (!hubId.equals(sensor.getHubId())) {
             sensor.setHubId(hubId);
             sensorRepository.save(sensor);
         }
