@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ScenarioConditionRepository extends JpaRepository<ScenarioCondition, ScenarioConditionId> {
-    boolean existById(Long scenarioId);
+
     List<ScenarioCondition> findByScenarioId(Long scenarioId);
 
     List<ScenarioCondition> findBySensorId(String id);
