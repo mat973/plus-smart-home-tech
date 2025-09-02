@@ -49,5 +49,20 @@ services:
       - ./db/init:/docker-entrypoint-initdb.d
       - analyzer_pgdata:/var/lib/postgresql/data
 
+  shopping-postgres:
+    image: postgres:15
+    container_name: shopping-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: shopping
+      POSTGRES_USER: shopping
+      POSTGRES_PASSWORD: shopping
+    ports:
+      - "5440:5432"
+    volumes:
+      - ./db/shopping-init:/docker-entrypoint-initdb.d
+      - shopping_pgdata:/var/lib/postgresql/data
+
 volumes:
   analyzer_pgdata:
+  shopping_pgdata:
