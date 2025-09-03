@@ -1,27 +1,36 @@
 package ru.yandex.practicum.model;
 
+import org.springframework.http.HttpStatus;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductNotFoundException extends RuntimeException {
-    private String httpStatus;
-    private String userMessage;
 
-    public ProductNotFoundException(String message, String userMessage, String httpStatus, Throwable cause) {
-        super(message, cause);
+    private final HttpStatus httpStatus;
+    private final String userMessage;
+
+    public ProductNotFoundException(String message, String userMessage) {
+        super(message);
+        this.httpStatus = HttpStatus.NOT_FOUND;
         this.userMessage = userMessage;
-        this.httpStatus = httpStatus;
+    }
+
+    public ProductNotFoundException(String message, String userMessage, Throwable cause) {
+        super(message, cause);
+        this.httpStatus = HttpStatus.NOT_FOUND;
+        this.userMessage = userMessage;
     }
 
     public String getHttpStatus() {
-        return httpStatus;
+        return httpStatus.value() + " " + httpStatus.name();
     }
 
     public String getUserMessage() {
         return userMessage;
     }
 
-
     public List<StackTraceElement> getFullStackTrace() {
-        return List.of(this.getStackTrace());
+        return Arrays.asList(this.getStackTrace());
     }
 }

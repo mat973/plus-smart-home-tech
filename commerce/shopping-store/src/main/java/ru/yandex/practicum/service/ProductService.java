@@ -5,11 +5,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.dto.producte.ProductCategory;
-import ru.yandex.practicum.dto.producte.ProductDto;
-import ru.yandex.practicum.dto.producte.SetProductQuantityStateRequest;
+import ru.yandex.practicum.dto.product.ProductCategory;
+import ru.yandex.practicum.dto.product.ProductDto;
+import ru.yandex.practicum.dto.product.SetProductQuantityStateRequest;
 import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.model.ProductNotFoundException;
@@ -31,7 +30,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto createProduct(@Valid ProductDto productDto) {
-        return  mapper.toProductDto(repository.save(mapper.toProduct(productDto)));
+        return mapper.toProductDto(repository.save(mapper.toProduct(productDto)));
 
     }
 
@@ -39,7 +38,7 @@ public class ProductService {
     public ProductDto updateProduct(@Valid ProductDto productDto) {
         Product product = repository.findById(productDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Продукта с id" + productDto.getProductId() + " не найдено",
-                        "Product not found", HttpStatus.NOT_FOUND.toString(), new RuntimeException("Underlying cause")));
+                        "Product not found", new RuntimeException("Underlying cause")));
         mapper.updateEntityFromDto(productDto, product);
         return mapper.toProductDto(product);
     }
@@ -48,7 +47,7 @@ public class ProductService {
     public boolean removeProduct(UUID productId) {
         if (!repository.existsById(productId)) {
             throw new ProductNotFoundException("Продукта с id" + productId + " не найдено",
-                    "Product not found", HttpStatus.NOT_FOUND.toString(), new RuntimeException("Underlying cause"));
+                    "Product not found", new RuntimeException("Underlying cause"));
         }
         repository.deleteById(productId);
         return true;
@@ -58,7 +57,7 @@ public class ProductService {
     public boolean changeQuantityState(@Valid SetProductQuantityStateRequest productDto) {
         Product product = repository.findById(productDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Продукта с id" + productDto.getProductId() + " не найдено",
-                        "Product not found", HttpStatus.NOT_FOUND.toString(), new RuntimeException("Underlying cause")));
+                        "Product not found", new RuntimeException("Underlying cause")));
         product.setQuantityState(productDto.getQuantityState());
         return true;
     }
@@ -66,6 +65,6 @@ public class ProductService {
     public ProductDto getProductById(UUID productId) {
         return mapper.toProductDto(repository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Продукта с id" + productId + " не найдено",
-                "Product not found", HttpStatus.NOT_FOUND.toString(), new RuntimeException("Underlying cause"))));
+                        "Product not found", new RuntimeException("Underlying cause"))));
     }
 }

@@ -22,6 +22,7 @@
         <module>telemetry/analyzer</module>
         <module>discovery-server</module>
         <module>commerce/interaction-api</module>
+        <module>commerce/shopping-cart</module>
     </modules>
 
     <properties>

@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.producte.ProductCategory;
-import ru.yandex.practicum.dto.producte.ProductDto;
-import ru.yandex.practicum.dto.producte.SetProductQuantityStateRequest;
+import ru.yandex.practicum.dto.product.ProductCategory;
+import ru.yandex.practicum.dto.product.ProductDto;
+import ru.yandex.practicum.dto.product.SetProductQuantityStateRequest;
 import ru.yandex.practicum.service.ProductService;
 
 import java.util.List;

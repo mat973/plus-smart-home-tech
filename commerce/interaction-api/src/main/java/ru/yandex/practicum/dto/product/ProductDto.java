@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dto.producte;
+package ru.yandex.practicum.dto.product;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
