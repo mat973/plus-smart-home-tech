@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.product.ProductCategory;
 import ru.yandex.practicum.dto.product.ProductDto;
+import ru.yandex.practicum.dto.product.ProductState;
 import ru.yandex.practicum.dto.product.SetProductQuantityStateRequest;
 import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
@@ -45,11 +46,10 @@ public class ProductService {
 
     @Transactional
     public boolean removeProduct(UUID productId) {
-        if (!repository.existsById(productId)) {
-            throw new ProductNotFoundException("Продукта с id" + productId + " не найдено",
-                    "Product not found", new RuntimeException("Underlying cause"));
-        }
-        repository.deleteById(productId);
+        Product product = repository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Продукта с id" + productId + " не найдено",
+                        "Product not found", new RuntimeException("Underlying cause")));
+        product.setProductState(ProductState.DEACTIVATE);
         return true;
     }
 
