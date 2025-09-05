@@ -10,10 +10,15 @@ import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
+import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.mapper.WarehouseMapper;
 import ru.yandex.practicum.model.WarehouseProduct;
 import ru.yandex.practicum.repository.WarehouseProductRepository;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +39,45 @@ public class WarehouseService {
 
     @Transactional
     public BookedProductsDto checkProductState(@Valid ShoppingCartDto cartDto) {
+        Set<UUID> productIds = cartDto.getProducts().keySet();
+        List<WarehouseProduct> products = repository.findAllById(productIds);
+        if (products.size() != productIds.size()) {
+            throw new ProductInShoppingCartLowQuantityInWarehouse(
+                    "Не все товары найдены на складе",
+                    "Некоторые товары отсутствуют в БД склада"
+            );
+        }
+
+        double totalWeight = 0;
+        double totalVolume = 0;
+        boolean hasFragile = false;
+
+        for (WarehouseProduct product : products) {
+            long requiredQty = cartDto.getProducts().get(product.getProductId());
+
+            if (product.getQuantity() < requiredQty) {
+                throw new ProductInShoppingCartLowQuantityInWarehouse(
+                        "Недостаточно товара",
+                        "Товара с id " + product.getProductId() + " доступно " + product.getQuantity()
+                );
+            }
+
+            totalWeight += product.getWeight() * requiredQty;
+            totalVolume += product.getWidth() * product.getHeight() * product.getDepth() * requiredQty;
+
+            if (product.isFragile()) {
+                hasFragile = true;
+            }
+        }
+
+        BookedProductsDto dto = new BookedProductsDto();
+        dto.setDeliveryWight(totalWeight);
+        dto.setDeliveryVolume(totalVolume);
+        dto.setFragile(hasFragile);
+
+        return dto;
     }
+
 
     @Transactional
     public void addQuantityProductToWarehouse(AddProductToWarehouseRequest request) {
