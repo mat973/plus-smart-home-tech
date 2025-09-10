@@ -2,18 +2,16 @@ package ru.yandex.practicum.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.model.WarehouseAddress;
 import ru.yandex.practicum.model.WarehouseProduct;
 
-@Mapper(componentModel = "spring")
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+
+@Mapper(componentModel = SPRING)
 public interface WarehouseMapper {
-
-    WarehouseMapper INSTANCE = Mappers.getMapper(WarehouseMapper.class);
-
 
 
     @Mapping(target = "productId", source = "productId")
@@ -22,9 +20,8 @@ public interface WarehouseMapper {
     @Mapping(target = "width", source = "dimension.width")
     @Mapping(target = "height", source = "dimension.height")
     @Mapping(target = "depth", source = "dimension.depth")
-    @Mapping(target = "quantity", constant = "0L") // при создании нового товара всегда 0
+    @Mapping(target = "quantity", constant = "0L")
     WarehouseProduct toEntity(NewProductInWarehouseRequest dto);
-
 
 
     WarehouseAddress toEntity(AddressDto dto);
@@ -32,7 +29,6 @@ public interface WarehouseMapper {
     AddressDto toDto(WarehouseAddress entity);
 
 
-
-    BookedProductsDto toBookedProductsDto(double deliveryWeight, double deliveryVolume, boolean fragile);
+    BookedProductsDto toBookedProductsDto(Double deliveryWeight, Double deliveryVolume, Boolean fragile);
 }
 

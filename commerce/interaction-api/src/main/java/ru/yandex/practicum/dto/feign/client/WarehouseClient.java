@@ -12,7 +12,7 @@ import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 
-@FeignClient(name = "warehouse-service", url = "${warehouse.service.url}")
+@FeignClient(name = "warehouse-service")
 public interface WarehouseClient {
 
     @PutMapping("/api/v1/warehouse")

@@ -25,7 +25,7 @@ public class ProductService {
     private final ProductMapper mapper;
 
     public List<ProductDto> getProductPagaeble(ProductCategory category, Pageable pageable) {
-        Page<Product> products = repository.findByCategory(category, pageable);
+        Page<Product> products = repository.findByProductCategory(category, pageable);
         return products.map(mapper::toProductDto).stream().toList();
     }
 

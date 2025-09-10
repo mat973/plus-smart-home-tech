@@ -1,10 +1,10 @@
-CREATE TABLE shopping_carts (
+CREATE TABLE  IF NOT EXISTS shopping_carts (
     cart_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL,
      active BOOLEAN NOT NULL DEFAULT true;
 );
 
-CREATE TABLE shopping_cart_products (
+CREATE TABLE  IF NOT EXISTS shopping_cart_products (
     cart_id UUID NOT NULL,
     product_id UUID NOT NULL,
     quantity BIGINT NOT NULL CHECK (quantity >= 0),

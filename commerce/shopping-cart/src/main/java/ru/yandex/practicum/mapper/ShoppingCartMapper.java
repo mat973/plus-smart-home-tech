@@ -2,7 +2,6 @@ package ru.yandex.practicum.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
 import ru.yandex.practicum.model.Cart;
 import ru.yandex.practicum.model.CartItem;
@@ -11,10 +10,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface ShoppingCartMapper {
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-    ShoppingCartMapper INSTANCE = Mappers.getMapper(ShoppingCartMapper.class);
+@Mapper(componentModel = SPRING)
+public interface ShoppingCartMapper {
 
 
     @Mapping(target = "shoppingCartId", source = "cartId")
