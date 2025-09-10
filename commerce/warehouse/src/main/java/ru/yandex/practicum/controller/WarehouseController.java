@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
+import ru.yandex.practicum.dto.feign.client.WarehouseClient;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -13,7 +14,7 @@ import ru.yandex.practicum.service.WarehouseService;
 @RestController
 @RequestMapping("/api/v1/warehouse")
 @RequiredArgsConstructor
-public class WarehouseController {
+public class WarehouseController implements WarehouseClient {
     private final WarehouseService service;
 
     @PutMapping

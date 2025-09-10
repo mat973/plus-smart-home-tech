@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.cart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
+import ru.yandex.practicum.dto.feign.client.WarehouseClient;
 import ru.yandex.practicum.exception.CartDeactivatedException;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.mapper.ShoppingCartMapper;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class CartService {
     private final CartRepository repository;
     private final ShoppingCartMapper mapper;
+    private final WarehouseClient client;
 
     @Transactional
     public ShoppingCartDto getCart(String username) {
@@ -43,25 +45,41 @@ public class CartService {
     }
 
     @Transactional
-    public ShoppingCartDto addProducts(String username, Map<UUID, Long> newProduct) {
-        Cart cart = repository.findByUsernameWithItems(username)
-                .orElseGet(() -> createNewCartInTransaction(username));
-        if (!cart.isActive()) {
-            throw new CartDeactivatedException("Корзина деактивирована", "Корзина для пользователя " + username + " недоступна");
+    public ShoppingCartDto addProducts(String username, Map<UUID, Long> newProducts) {
+        if (newProducts == null || newProducts.isEmpty()) {
+            throw new IllegalArgumentException("Список товаров для добавления не может быть пустым");
         }
-        Map<UUID, CartItem> existingItemsMap = cart.getItems().stream()
-                .collect(Collectors.toMap(
-                        item -> item.getId().getProductId(),
-                        Function.identity()
-                ));
 
-        newProduct.forEach((productId, quantity) -> {
-            if (existingItemsMap.containsKey(productId)) {
-                CartItem existingItem = existingItemsMap.get(productId);
-                existingItem.setQuantity(existingItem.getQuantity() + quantity);
+        Cart cart = repository.findByUsernameWithItems(username)
+                .orElseGet(() -> createCartForUser(username));
+
+        if (!cart.isActive()) {
+            throw new CartDeactivatedException(
+                    "Корзина деактивирована",
+                    "Корзина для пользователя " + username + " недоступна"
+            );
+        }
+
+        // 1. Формируем DTO для проверки на складе
+        ShoppingCartDto cartDto = mapper.toDto(cart);
+        newProducts.forEach((productId, quantity) ->
+                cartDto.getProducts().merge(productId, quantity, Long::sum)
+        );
+
+
+        client.checkProductState(cartDto);
+
+        Map<UUID, CartItem> existingItems = cart.getItems().stream()
+                .collect(Collectors.toMap(item -> item.getId().getProductId(), Function.identity()));
+
+        newProducts.forEach((productId, quantity) -> {
+            CartItem item = existingItems.get(productId);
+            if (item != null) {
+                item.setQuantity(item.getQuantity() + quantity);
             } else {
+                CartItemId id = new CartItemId(cart.getCartId(), productId);
                 CartItem newItem = CartItem.builder()
-                        .id(new CartItemId(cart.getCartId(), productId))
+                        .id(id)
                         .cart(cart)
                         .quantity(quantity)
                         .build();
@@ -69,8 +87,7 @@ public class CartService {
             }
         });
 
-        Cart savedCart = repository.save(cart);
-        return mapper.toDto(savedCart);
+        return mapper.toDto(cart);
     }
 
     @Transactional
@@ -118,5 +135,13 @@ public class CartService {
                 ));
         cartItem.setQuantity(request.getNewQuantity());
         return mapper.toDto(cart);
+    }
+
+    private Cart createCartForUser(String username) {
+         return repository.save(Cart.builder()
+                .username(username)
+                .active(true)
+                .build());
+
     }
 }

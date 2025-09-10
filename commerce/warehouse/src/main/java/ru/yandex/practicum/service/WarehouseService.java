@@ -16,7 +16,9 @@ import ru.yandex.practicum.mapper.WarehouseMapper;
 import ru.yandex.practicum.model.WarehouseProduct;
 import ru.yandex.practicum.repository.WarehouseProductRepository;
 
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +27,12 @@ import java.util.UUID;
 public class WarehouseService {
     private final WarehouseProductRepository repository;
     private final WarehouseMapper mapper;
+
+    private static final String[] ADDRESSES = {"ADDRESS_1", "ADDRESS_2"};
+
+    private static final String CURRENT_ADDRESS =
+            ADDRESSES[Random.from(new SecureRandom()).nextInt(0, 1)];
+
 
     @Transactional
     public void createProduct(@Valid NewProductInWarehouseRequest request) {
@@ -88,5 +96,12 @@ public class WarehouseService {
     }
 
     public AddressDto getCurrentWarehouseAddress() {
+        AddressDto dto = new AddressDto();
+        dto.setCountry(CURRENT_ADDRESS);
+        dto.setCity(CURRENT_ADDRESS);
+        dto.setStreet(CURRENT_ADDRESS);
+        dto.setHouse(CURRENT_ADDRESS);
+        dto.setFlat(CURRENT_ADDRESS);
+        return dto;
     }
 }
