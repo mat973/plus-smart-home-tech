@@ -1,12 +1,11 @@
 services:
-
   kafka:
     image: confluentinc/confluent-local:7.4.3
     hostname: kafka
     container_name: kafka
     ports:
-      - "9092:9092" # for client connections
-      - "9101:9101" # JMX
+      - "9092:9092"
+      - "9101:9101"
     restart: unless-stopped
     environment:
       KAFKA_NODE_ID: 1
@@ -23,21 +22,23 @@ services:
     container_name: kafka-init-topics
     depends_on:
       - kafka
-    command: "bash -c \
-                'kafka-topics --create --topic telemetry.sensors.v1 \
-                             --partitions 1 --replication-factor 1 --if-not-exists \
-                             --bootstrap-server kafka:29092 && \
-                kafka-topics --create --topic telemetry.snapshots.v1 \
-                             --partitions 1 --replication-factor 1 --if-not-exists \
-                             --bootstrap-server kafka:29092 && \
-                kafka-topics --create --topic telemetry.hubs.v1 \
-                             --partitions 1 --replication-factor 1 --if-not-exists \
-                             --bootstrap-server kafka:29092'"
+    command: >
+      bash -c '
+        kafka-topics --create --topic telemetry.sensors.v1
+                     --partitions 1 --replication-factor 1 --if-not-exists
+                     --bootstrap-server kafka:29092 &&
+        kafka-topics --create --topic telemetry.snapshots.v1
+                     --partitions 1 --replication-factor 1 --if-not-exists
+                     --bootstrap-server kafka:29092 &&
+        kafka-topics --create --topic telemetry.hubs.v1
+                     --partitions 1 --replication-factor 1 --if-not-exists
+                     --bootstrap-server kafka:29092
+      '
     init: true
 
-  postgres:
+  analyzer-db:
     image: postgres:15
-    container_name: analyzer-postgres
+    container_name: analyzer-db
     restart: always
     environment:
       POSTGRES_DB: analyzer
@@ -46,23 +47,46 @@ services:
     ports:
       - "5439:5432"
     volumes:
-      - ./db/init:/docker-entrypoint-initdb.d
       - analyzer_pgdata:/var/lib/postgresql/data
 
-  shopping-postgres:
-    image: postgres:15
-    container_name: shopping-postgres
-    restart: always
-    environment:
-      POSTGRES_DB: shopping
-      POSTGRES_USER: shopping
-      POSTGRES_PASSWORD: shopping
+  store-db:
+    image: postgres:16.1
+    container_name: store-db
     ports:
-      - "5440:5432"
+      - "6432:5432"
+    environment:
+      - POSTGRES_DB=store
+      - POSTGRES_USER=store
+      - POSTGRES_PASSWORD=store
     volumes:
-      - ./db/shopping-init:/docker-entrypoint-initdb.d
-      - shopping_pgdata:/var/lib/postgresql/data
+      - store_pgdata:/var/lib/postgresql/data
+
+  cart-db:
+    image: postgres:16.1
+    container_name: cart-db
+    ports:
+      - "7432:5432"
+    environment:
+      - POSTGRES_DB=cart
+      - POSTGRES_USER=cart
+      - POSTGRES_PASSWORD=cart
+    volumes:
+      - cart_pgdata:/var/lib/postgresql/data
+
+  warehouse-db:
+    image: postgres:16.1
+    container_name: warehouse-db
+    ports:
+      - "8432:5432"
+    environment:
+      - POSTGRES_DB=warehouse
+      - POSTGRES_USER=warehouse
+      - POSTGRES_PASSWORD=warehouse
+    volumes:
+      - warehouse_pgdata:/var/lib/postgresql/data
 
 volumes:
   analyzer_pgdata:
-  shopping_pgdata:
+  store_pgdata:
+  cart_pgdata:
+  warehouse_pgdata:

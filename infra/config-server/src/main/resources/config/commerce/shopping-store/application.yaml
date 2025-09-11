@@ -10,7 +10,6 @@ spring:
     init:
       mode: always
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/shopping
-    username: shopping
-    password: shopping
+    url: jdbc:postgresql://localhost:6432/store
+    username: store
+    password: store
