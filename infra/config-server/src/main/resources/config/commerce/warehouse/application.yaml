@@ -10,7 +10,7 @@ spring:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://warehouse-db:5432/warehouse
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:8432/warehouse
     username: warehouse
     password: warehouse
-    driver-class-name: org.postgresql.Driver
