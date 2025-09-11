@@ -48,35 +48,50 @@ services:
       - "5439:5432"
 
 
-  store-db:
-    image: postgres:16.1
-    container_name: store-db
-    ports:
-      - "6432:5432"
-    environment:
-      - POSTGRES_DB=store
-      - POSTGRES_USER=store
-      - POSTGRES_PASSWORD=store
+store-db:
+  image: postgres:16.1
+  container_name: postgres-store
+  ports:
+    - "6432:5432"
+  environment:
+    POSTGRES_USER: store
+    POSTGRES_PASSWORD: store
+    POSTGRES_DB: store
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U store -d store"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
 
 
-  cart-db:
-    image: postgres:16.1
-    container_name: cart-db
-    ports:
-      - "7432:5432"
-    environment:
-      - POSTGRES_DB=cart
-      - POSTGRES_USER=cart
-      - POSTGRES_PASSWORD=cart
+cart-db:
+  image: postgres:16.1
+  container_name: postgres-cart
+  ports:
+    - "7432:5432"
+  environment:
+    POSTGRES_USER: cart
+    POSTGRES_PASSWORD: cart
+    POSTGRES_DB: cart
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U cart -d cart"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
 
 
-  warehouse-db:
-    image: postgres:16.1
-    container_name: warehouse-db
-    ports:
-      - "8432:5432"
-    environment:
-      - POSTGRES_DB=warehouse
-      - POSTGRES_USER=warehouse
-      - POSTGRES_PASSWORD=warehouse
+warehouse-db:
+  image: postgres:16.1
+  container_name: warehouse-db
+  ports:
+    - "8432:5432"
+  environment:
+    POSTGRES_USER: warehouse
+    POSTGRES_PASSWORD: warehouse
+    POSTGRES_DB: warehouse
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U warehouse -d warehouse"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
 
