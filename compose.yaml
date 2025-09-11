@@ -46,8 +46,7 @@ services:
       POSTGRES_PASSWORD: analyzer
     ports:
       - "5439:5432"
-    volumes:
-      - analyzer_pgdata:/var/lib/postgresql/data
+
 
   store-db:
     image: postgres:16.1
@@ -58,8 +57,7 @@ services:
       - POSTGRES_DB=store
       - POSTGRES_USER=store
       - POSTGRES_PASSWORD=store
-    volumes:
-      - store_pgdata:/var/lib/postgresql/data
+
 
   cart-db:
     image: postgres:16.1
@@ -70,8 +68,7 @@ services:
       - POSTGRES_DB=cart
       - POSTGRES_USER=cart
       - POSTGRES_PASSWORD=cart
-    volumes:
-      - cart_pgdata:/var/lib/postgresql/data
+
 
   warehouse-db:
     image: postgres:16.1
@@ -82,11 +79,4 @@ services:
       - POSTGRES_DB=warehouse
       - POSTGRES_USER=warehouse
       - POSTGRES_PASSWORD=warehouse
-    volumes:
-      - warehouse_pgdata:/var/lib/postgresql/data
 
-volumes:
-  analyzer_pgdata:
-  store_pgdata:
-  cart_pgdata:
-  warehouse_pgdata:
