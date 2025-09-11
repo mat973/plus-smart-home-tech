@@ -13,4 +13,4 @@ spring:
     url: jdbc:postgresql://warehouse-db:5432/warehouse
     username: warehouse
     password: warehouse
-    driver-class-name: org.postgresql.Drive
+    driver-class-name: org.postgresql.Driver
