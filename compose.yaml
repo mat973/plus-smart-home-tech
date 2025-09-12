@@ -37,7 +37,7 @@ services:
     init: true
 
   analyzer-db:
-    image: postgres:15
+    image: postgres:16.1
     container_name: analyzer-db
     restart: always
     environment:
