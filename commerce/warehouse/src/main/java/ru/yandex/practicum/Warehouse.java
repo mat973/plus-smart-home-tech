@@ -9,6 +9,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class Warehouse {
     public static void main(String[] args) {
-        SpringApplication.run(Warehouse.class);
+        SpringApplication.run(Warehouse.class, args);
     }
 }
