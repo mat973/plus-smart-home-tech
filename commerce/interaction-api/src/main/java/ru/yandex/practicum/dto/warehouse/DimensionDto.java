@@ -4,9 +4,11 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class DimensionDto {
     @DecimalMin(value = "1.0", message = "Минимальное значение ширины 0.0")
     @NotNull
