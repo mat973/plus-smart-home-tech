@@ -1,9 +1,7 @@
 package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -12,6 +10,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CartItem {
 
     @EmbeddedId
@@ -19,6 +19,7 @@ public class CartItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("cartId")
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @Column(nullable = false)

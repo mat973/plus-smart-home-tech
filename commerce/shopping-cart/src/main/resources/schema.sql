@@ -1,7 +1,7 @@
 CREATE TABLE  IF NOT EXISTS shopping_carts (
     cart_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL,
-     active BOOLEAN NOT NULL DEFAULT true;
+     active BOOLEAN NOT NULL DEFAULT true
 );
 
 CREATE TABLE  IF NOT EXISTS shopping_cart_products (

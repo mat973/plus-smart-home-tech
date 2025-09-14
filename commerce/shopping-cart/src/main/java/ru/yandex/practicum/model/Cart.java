@@ -1,10 +1,9 @@
 package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,6 +12,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cart {
 
     @Id
@@ -23,9 +24,11 @@ public class Cart {
     private String username;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<CartItem> items;
+    @Builder.Default
+    private Set<CartItem> items = new HashSet<>();
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
 }
 

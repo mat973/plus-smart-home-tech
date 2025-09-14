@@ -15,7 +15,6 @@ import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.model.ProductNotFoundException;
 import ru.yandex.practicum.repository.ProductRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,9 +23,8 @@ public class ProductService {
     private final ProductRepository repository;
     private final ProductMapper mapper;
 
-    public List<ProductDto> getProductPagaeble(ProductCategory category, Pageable pageable) {
-        Page<Product> products = repository.findByProductCategory(category, pageable);
-        return products.map(mapper::toProductDto).stream().toList();
+    public Page<ProductDto> getProductPagaeble(ProductCategory category, Pageable pageable) {
+        return repository.findByProductCategory(category, pageable).map(mapper::toProductDto);
     }
 
     @Transactional

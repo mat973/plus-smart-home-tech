@@ -31,7 +31,7 @@ public class CartController {
     @PutMapping
     public ShoppingCartDto addProduct(@RequestParam @NotBlank(message = "Имя пользователя на должно быть пустым") String username,
                                       @RequestBody Map<UUID, Long> newProduct) {
-        log.info("Запрос пользователя с username {} на добавление продуктов в корзину {}", username, newProduct);
+        log.info("Запрос пользователя с username {} на добавление продуктов в корзину {}", username, newProduct.toString());
         return cartService.addProducts(username, newProduct);
     }
 
@@ -43,11 +43,11 @@ public class CartController {
     }
 
     @PostMapping("/remove")
-    public void deleteProductFromCart(@RequestParam @NotBlank(message = "Имя пользователя на должно быть пустым") String username,
+    public ShoppingCartDto deleteProductFromCart(@RequestParam @NotBlank(message = "Имя пользователя на должно быть пустым") String username,
                                       @RequestBody List<UUID> productIds) {
         log.info("Запрос на удаление продуктов из корзины пользователя : {}, список id продуктов {}",
-                username, productIds);
-        cartService.deleteProductFromCart(username, productIds);
+                username, productIds.toString());
+        return cartService.deleteProductFromCart(username, productIds);
     }
 
     @PostMapping("/change-quantity")

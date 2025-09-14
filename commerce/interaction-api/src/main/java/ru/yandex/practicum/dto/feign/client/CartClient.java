@@ -1,0 +1,39 @@
+package ru.yandex.practicum.dto.feign.client;
+
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.cart.ChangeProductQuantityRequest;
+import ru.yandex.practicum.dto.cart.ShoppingCartDto;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@FeignClient(name = "SHOPPING-CART")
+public interface CartClient {
+
+    @GetMapping("/api/v1/shopping-cart")
+    ShoppingCartDto getCart(@RequestParam("username") @NotBlank String username);
+
+    @PutMapping("/api/v1/shopping-cart")
+    ShoppingCartDto addProduct(
+            @RequestParam("username") @NotBlank String username,
+            @RequestBody Map<UUID, Long> newProduct
+    );
+
+    @DeleteMapping("/api/v1/shopping-cart")
+    void deleteCart(@RequestParam("username") @NotBlank String username);
+
+    @PostMapping("/api/v1/shopping-cart/remove")
+    ShoppingCartDto deleteProductFromCart(
+            @RequestParam("username") @NotBlank String username,
+            @RequestBody List<UUID> productIds
+    );
+
+    @PostMapping("/api/v1/shopping-cart/change-quantity")
+    ShoppingCartDto changeProductQuantity(
+            @RequestParam("username") @NotBlank String username,
+            @RequestBody ChangeProductQuantityRequest productQuantityRequest
+    );
+}

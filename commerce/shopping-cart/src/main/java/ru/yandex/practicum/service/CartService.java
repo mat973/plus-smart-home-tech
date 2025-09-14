@@ -60,34 +60,48 @@ public class CartService {
             );
         }
 
-        // 1. Формируем DTO для проверки на складе
-        ShoppingCartDto cartDto = mapper.toDto(cart);
-        newProducts.forEach((productId, quantity) ->
-                cartDto.getProducts().merge(productId, quantity, Long::sum)
-        );
+
+        ShoppingCartDto checkDto = mapper.toDto(cart);
 
 
-        client.checkProductState(cartDto);
+        newProducts.forEach(checkDto::mergeProduct);
 
+
+        client.checkProductState(checkDto);
+
+
+        updateCartItems(cart, newProducts);
+        cart = repository.save(cart);
+
+        return mapper.toDto(cart);
+    }
+
+    private void updateCartItems(Cart cart, Map<UUID, Long> newProducts) {
         Map<UUID, CartItem> existingItems = cart.getItems().stream()
-                .collect(Collectors.toMap(item -> item.getId().getProductId(), Function.identity()));
+                .collect(Collectors.toMap(
+                        item -> item.getId().getProductId(),
+                        Function.identity()
+                ));
 
         newProducts.forEach((productId, quantity) -> {
             CartItem item = existingItems.get(productId);
             if (item != null) {
                 item.setQuantity(item.getQuantity() + quantity);
             } else {
-                CartItemId id = new CartItemId(cart.getCartId(), productId);
-                CartItem newItem = CartItem.builder()
-                        .id(id)
-                        .cart(cart)
-                        .quantity(quantity)
-                        .build();
+                CartItem newItem = createNewCartItem(cart, productId, quantity);
                 cart.getItems().add(newItem);
             }
         });
+    }
 
-        return mapper.toDto(cart);
+
+    private CartItem createNewCartItem(Cart cart, UUID productId, Long quantity) {
+        CartItemId id = new CartItemId(cart.getCartId(), productId);
+        return CartItem.builder()
+                .id(id)
+                .cart(cart)
+                .quantity(quantity)
+                .build();
     }
 
     @Transactional
@@ -98,7 +112,7 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteProductFromCart(String username, List<UUID> productIds) {
+    public ShoppingCartDto deleteProductFromCart(String username, List<UUID> productIds) {
         Cart cart = repository.findByUsernameWithItems(username)
                 .orElseThrow(() -> new EntityNotFoundException("Корзина не найдена для пользователя: " + username));
 
@@ -115,6 +129,8 @@ public class CartService {
         }
 
         toRemove.forEach(cart.getItems()::remove);
+
+        return mapper.toDto(cart);
     }
 
     @Transactional
