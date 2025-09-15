@@ -14,26 +14,26 @@ import java.util.UUID;
 public interface CartClient {
 
     @GetMapping("/api/v1/shopping-cart")
-    ShoppingCartDto getCart(@RequestParam("username") @NotBlank String username);
+    ShoppingCartDto getCart(@RequestParam("username") String username);
 
     @PutMapping("/api/v1/shopping-cart")
     ShoppingCartDto addProduct(
-            @RequestParam("username") @NotBlank String username,
+            @RequestParam("username") String username,
             @RequestBody Map<UUID, Long> newProduct
     );
 
     @DeleteMapping("/api/v1/shopping-cart")
-    void deleteCart(@RequestParam("username") @NotBlank String username);
+    void deleteCart(@RequestParam("username") String username);
 
     @PostMapping("/api/v1/shopping-cart/remove")
     ShoppingCartDto deleteProductFromCart(
-            @RequestParam("username") @NotBlank String username,
+            @RequestParam("username") String username,
             @RequestBody List<UUID> productIds
     );
 
     @PostMapping("/api/v1/shopping-cart/change-quantity")
     ShoppingCartDto changeProductQuantity(
-            @RequestParam("username") @NotBlank String username,
+            @RequestParam("username") String username,
             @RequestBody ChangeProductQuantityRequest productQuantityRequest
     );
 }

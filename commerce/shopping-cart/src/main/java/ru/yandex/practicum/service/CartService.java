@@ -60,15 +60,11 @@ public class CartService {
             );
         }
 
-
         ShoppingCartDto checkDto = mapper.toDto(cart);
-
 
         newProducts.forEach(checkDto::mergeProduct);
 
-
         client.checkProductState(checkDto);
-
 
         updateCartItems(cart, newProducts);
         cart = repository.save(cart);
@@ -106,9 +102,9 @@ public class CartService {
 
     @Transactional
     public void deleteCart(String username) {
-        Cart cart = repository.findByUsernameWithItems(username)
-                .orElseThrow(() -> new EntityNotFoundException("Корзина не найдена для пользователя: " + username));
-        cart.setActive(false);
+        if (repository.deactivateCartByUsername(username) == 0){
+            throw new EntityNotFoundException("Корзина не найдена для пользователя: " + username);
+        }
     }
 
     @Transactional
@@ -154,7 +150,7 @@ public class CartService {
     }
 
     private Cart createCartForUser(String username) {
-         return repository.save(Cart.builder()
+        return repository.save(Cart.builder()
                 .username(username)
                 .active(true)
                 .build());

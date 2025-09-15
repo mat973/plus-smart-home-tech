@@ -1,6 +1,7 @@
 package ru.yandex.practicum.dto.cart;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -11,13 +12,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class ShoppingCartDto {
     private UUID shoppingCartId;
-    private Map<UUID, Long> products;
+    private Map<UUID, Long> products = new HashMap<>();
 
-    public ShoppingCartDto() {
-        this.products = new HashMap<>();
-    }
 
     public ShoppingCartDto(UUID shoppingCartId, Map<UUID, Long> products) {
         this.shoppingCartId = shoppingCartId;

@@ -23,7 +23,7 @@ public class Cart {
     @Column(nullable = false)
     private String username;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<CartItem> items = new HashSet<>();
 

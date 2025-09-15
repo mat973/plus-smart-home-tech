@@ -22,10 +22,10 @@ public interface ShoppingStoreClient {
     );
 
     @PutMapping("/api/v1/shopping-store")
-    ProductDto createProduct(@RequestBody @Valid ProductDto productDto);
+    ProductDto createProduct(@RequestBody ProductDto productDto);
 
     @PostMapping("/api/v1/shopping-store")
-    ProductDto updateProduct(@RequestBody @Valid ProductDto productDto);
+    ProductDto updateProduct(@RequestBody ProductDto productDto);
 
     @PostMapping("/api/v1/shopping-store/removeProductFromStore")
     boolean removeProduct(@RequestBody UUID productId);
