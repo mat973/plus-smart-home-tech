@@ -20,7 +20,9 @@
         <module>infra</module>
         <module>commerce</module>
         <module>telemetry/analyzer</module>
-        <module>discovery-server</module>
+        <module>commerce/interaction-api</module>
+        <module>commerce/shopping-cart</module>
+        <module>commerce/warehouse</module>
     </modules>
 
     <properties>
