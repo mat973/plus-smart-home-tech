@@ -9,9 +9,25 @@ spring:
 
       routes:
         - id: shopping_cart_service_route
-          uri: lb:/SHOPPING-CART
-
+          uri: lb://SHOPPING-CART
           predicates:
             - Path=/shopping-cart/**
           filters:
             - PrefixPath=/api/v1
+
+        - id: shopping_store_service_route
+          uri: lb://SHOPPING-STORE
+          predicates:
+            - Path=/shopping-store/**
+          filters:
+            - PrefixPath=/api/v1
+            - name: Retry
+              args:
+                retries: 3
+                statuses: NOT_FOUND
+                methods: GET, POST
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 50ms
+                  factor: 2
+                  basedOnPreviousValue: false
