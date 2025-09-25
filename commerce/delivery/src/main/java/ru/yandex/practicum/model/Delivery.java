@@ -1,10 +1,8 @@
 package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import ru.yandex.practicum.dto.delivery.State;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
+
 
 import java.util.UUID;
 
@@ -30,7 +28,7 @@ public class Delivery {
             @AttributeOverride(name = "house", column = @Column(name = "from_house")),
             @AttributeOverride(name = "flat", column = @Column(name = "from_flat"))
     })
-    private AddressDto fromAddress;
+    private Address fromAddress;
 
     @Embedded
     @AttributeOverrides({
@@ -40,7 +38,7 @@ public class Delivery {
             @AttributeOverride(name = "house", column = @Column(name = "to_house")),
             @AttributeOverride(name = "flat", column = @Column(name = "to_flat"))
     })
-    private AddressDto toAddress;
+    private Address toAddress;
 
     private UUID orderId;
     @Enumerated(EnumType.STRING)
