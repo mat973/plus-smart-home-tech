@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.feign.client.WarehouseClient;
 import ru.yandex.practicum.dto.order.OrderDto;
+import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.mapper.DeliveryMapper;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.model.State;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class DeliveryService {
     private final DeliveryRepository repository;
     private final DeliveryMapper mapper;
+    private final WarehouseClient warehouseClient;
 
     @Transactional
     public DeliveryDto createOrder(DeliveryDto deliveryDto) {
@@ -41,9 +44,33 @@ public class DeliveryService {
     @Transactional
     public void failedDelivery(UUID deliveryId) {
         Delivery delivery = repository.findById(deliveryId).orElseThrow(NotFoundException::new);
-        delivery.setDeliveryState(State.FAILED;
+        delivery.setDeliveryState(State.FAILED);
     }
 
-    public BigDecimal costDelivery(@Valid OrderDto orderDto) {
+    public BigDecimal costDelivery(OrderDto orderDto) {
+        Delivery delivery = repository.findById(orderDto.getDeliveryId())
+                .orElseThrow(() -> new NotFoundException("Доставка не найдена"));
+        BigDecimal cost = new BigDecimal("5.0");
+        AddressDto warehouseAddress = warehouseClient.getCurrentWarehouseAddress();
+        if ("ADDRESS_2".equals(warehouseAddress.getCity())) {
+            cost = cost.add(cost.multiply(new BigDecimal("2")));
+        }
+//        else {
+//            cost = cost.add(cost.multiply(new BigDecimal("1")));
+//        }
+        if (Boolean.TRUE.equals(orderDto.getFragile())) {
+            cost = cost.add(cost.multiply(new BigDecimal("0.2")));
+        }
+
+        cost = cost.add(BigDecimal.valueOf(orderDto.getDeliveryWeight()).multiply(BigDecimal.valueOf(0.3)));
+
+        cost = cost.add(BigDecimal.valueOf(orderDto.getDeliveryVolume()).multiply(BigDecimal.valueOf(0.2)));
+
+        if (warehouseAddress.getCity().equals(delivery.getToAddress().getCity())
+                && warehouseAddress.getStreet().equals(delivery.getToAddress().getStreet())){
+            return cost;
+        }else {
+            return cost.add(cost.multiply(BigDecimal.valueOf(0.2)));
+        }
     }
 }

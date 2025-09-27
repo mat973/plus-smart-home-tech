@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dto.order;
+package ru.yandex.practicum.dto.payment;
 
 import lombok.*;
 
@@ -7,10 +7,10 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PaymentDto {
     private UUID paymentId;
     private BigDecimal totalPayment;

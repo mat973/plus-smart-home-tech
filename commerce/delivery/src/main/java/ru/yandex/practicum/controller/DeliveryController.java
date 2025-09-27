@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.feign.client.DeliveryClient;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.service.DeliveryService;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/delivery")
 @RequiredArgsConstructor
 @Slf4j
-public class DeliveryController {
+public class DeliveryController implements DeliveryClient {
    private final DeliveryService service;
     @PutMapping
     public DeliveryDto createOrder(@Valid @RequestBody DeliveryDto deliveryDto){
@@ -24,21 +25,25 @@ public class DeliveryController {
     }
     @PostMapping("/successful")
     public void successfulDelivery(@RequestBody UUID deliveryId){
+        log.info("Запрос на изменение статуса заказа c id {} на успешное", deliveryId);
         service.successfulDelivery(deliveryId);
     }
 
     @PostMapping("/picked")
     public void pickedDelivery(@RequestBody UUID deliveryId){
+        log.info("Запрос на изменение статуса заказа c id {} на принято в работу", deliveryId);
         service.pickedDelivery(deliveryId);
     }
 
     @PostMapping("/failed")
     public void failedDelivery(@RequestBody UUID deliveryId){
+        log.info("Запрос на изменение статуса заказа c id {} на неудачная доставка", deliveryId);
         service.failedDelivery(deliveryId);
     }
 
     @PostMapping("/cost")
     public BigDecimal costDelivery(@Valid @RequestBody OrderDto orderDto){
+        log.info("Расчет стоимости заказа {}", orderDto);
         return service.costDelivery(orderDto);
     }
 }
