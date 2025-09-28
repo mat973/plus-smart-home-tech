@@ -9,5 +9,5 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface OrderMapper {
     Order toOrder(OrderDto orderDto);
-    OrderDto toORderDto(Order order);
+    OrderDto toOrderDto(Order order);
 }

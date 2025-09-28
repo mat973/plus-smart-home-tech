@@ -1,7 +1,6 @@
 package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ru.yandex.practicum.dto.order.State;
 
@@ -21,7 +20,7 @@ public class Order {
     @GeneratedValue
     private UUID orderId;
     private UUID shoppingCartId;
-    private Map<UUID, Integer> products;
+    private Map<UUID, Long> products;
     private UUID paymentId;
     private UUID deliveryId;
     @Enumerated(EnumType.STRING)

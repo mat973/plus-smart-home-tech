@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.feign.client.OrderClient;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
@@ -20,16 +21,18 @@ import java.util.UUID;
 @RequestMapping("/api/v1/order")
 @Slf4j
 @Validated
-public class OrderController {
+public class OrderController implements OrderClient {
 
     private final OrderService orderService;
 
     @GetMapping
     public List<OrderDto> getClientOrders(
             @RequestParam
-            @NotBlank(message = "Имя пользователя не должно быть пустым") String username) {
+            @NotBlank(message = "Имя пользователя не должно быть пустым") String username,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
         log.info("Выполняется запрос на получение заказы пользователя username={}", username);
-        return orderService.getClientOrders(username);
+        return orderService.getClientOrders(username, page, size);
     }
 
     @PutMapping

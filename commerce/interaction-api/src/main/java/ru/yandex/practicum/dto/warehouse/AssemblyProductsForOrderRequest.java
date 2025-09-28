@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dto.order;
+package ru.yandex.practicum.dto.warehouse;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -8,12 +8,13 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
-public class ProductReturnRequest {
-    private UUID orderId;
+public class AssemblyProductsForOrderRequest {
     @NotNull
     private Map<UUID, Long> products;
+    @NotNull
+    private UUID orderId;
 }

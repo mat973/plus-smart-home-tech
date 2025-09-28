@@ -1,14 +1,15 @@
 package ru.yandex.practicum.service;
 
-import jakarta.validation.Valid;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.feign.client.OrderClient;
 import ru.yandex.practicum.dto.feign.client.WarehouseClient;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
+import ru.yandex.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.mapper.DeliveryMapper;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.model.State;
@@ -23,6 +24,7 @@ public class DeliveryService {
     private final DeliveryRepository repository;
     private final DeliveryMapper mapper;
     private final WarehouseClient warehouseClient;
+    private final OrderClient orderClient;
 
     @Transactional
     public DeliveryDto createOrder(DeliveryDto deliveryDto) {
@@ -34,17 +36,23 @@ public class DeliveryService {
     public void successfulDelivery(UUID deliveryId) {
         Delivery delivery = repository.findById(deliveryId).orElseThrow(NotFoundException::new);
         delivery.setDeliveryState(State.DELIVERED);
+        orderClient.complete(delivery.getOrderId());
     }
 
     @Transactional
     public void pickedDelivery(UUID deliveryId) {
         Delivery delivery = repository.findById(deliveryId).orElseThrow(NotFoundException::new);
         delivery.setDeliveryState(State.IN_PROGRESS);
+        orderClient.assembly(delivery.getOrderId());
+        ShippedToDeliveryRequest deliveryRequest = new ShippedToDeliveryRequest(
+                delivery.getOrderId(), delivery.getDeliveryId());
+        warehouseClient.shippedToDelivery(deliveryRequest);
     }
     @Transactional
     public void failedDelivery(UUID deliveryId) {
         Delivery delivery = repository.findById(deliveryId).orElseThrow(NotFoundException::new);
         delivery.setDeliveryState(State.FAILED);
+        orderClient.assemblyFailed(delivery.getOrderId());
     }
 
     public BigDecimal costDelivery(OrderDto orderDto) {

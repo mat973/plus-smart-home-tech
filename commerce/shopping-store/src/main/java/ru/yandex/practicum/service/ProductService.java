@@ -3,6 +3,7 @@ package ru.yandex.practicum.service;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,15 @@ import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.model.ProductNotFoundException;
 import ru.yandex.practicum.repository.ProductRepository;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
     private final ProductRepository repository;
     private final ProductMapper mapper;
@@ -64,5 +70,12 @@ public class ProductService {
         return mapper.toProductDto(repository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Продукта с id" + productId + " не найдено",
                         "Product not found", new RuntimeException("Underlying cause"))));
+    }
+
+
+    public Map<UUID, BigDecimal> getProductPrices(List<UUID> productIds) {
+        log.info("Получение цен для списка продуктов: {}", productIds);
+        return repository.findAllByProductIdIn(productIds).stream()
+                .collect(Collectors.toMap(Product::getProductId, Product::getPrice));
     }
 }

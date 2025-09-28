@@ -4,10 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import ru.yandex.practicum.dto.feign.client.CartClient;
+import ru.yandex.practicum.dto.feign.client.DeliveryClient;
+import ru.yandex.practicum.dto.feign.client.PaymentClient;
+import ru.yandex.practicum.dto.feign.client.WarehouseClient;
 
 
 @SpringBootApplication
-@EnableFeignClients(clients = {CartClient.class})
+@EnableFeignClients(clients = {CartClient.class, WarehouseClient.class, DeliveryClient.class, PaymentClient.class})
 public class Order {
     public static void main(String[] args) {
         SpringApplication.run(Order.class, args);

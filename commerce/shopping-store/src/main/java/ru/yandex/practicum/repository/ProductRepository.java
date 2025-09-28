@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.yandex.practicum.dto.product.ProductCategory;
 import ru.yandex.practicum.model.Product;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> findByProductCategory(ProductCategory category, Pageable pageable);
+    List<Product> findAllByProductIdIn(List<UUID> productIds);
 }

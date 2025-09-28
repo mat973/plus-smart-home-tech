@@ -4,6 +4,8 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.feign.client.OrderClient;
+import ru.yandex.practicum.dto.feign.client.ShoppingStoreClient;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.mapper.PaymentMapper;
@@ -12,6 +14,8 @@ import ru.yandex.practicum.model.PaymentStatus;
 import ru.yandex.practicum.repository.PaymentRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -20,6 +24,8 @@ public class PaymentService {
 
     private final PaymentRepository repository;
     private final PaymentMapper mapper;
+    private final ShoppingStoreClient shoppingStoreClient;
+    private final OrderClient orderClient;
 
     public PaymentDto createPayment(OrderDto orderDto) {
         Payment payment = Payment.builder()
@@ -42,16 +48,24 @@ public class PaymentService {
     public void refundOrder(UUID paymentId) {
         Payment payment = repository.findById(paymentId).orElseThrow(() -> new NotFoundException("Оплата не найдена"));
         payment.setStatus(PaymentStatus.SUCCESS);
+        orderClient.payment(payment.getOrderId());
     }
 
     public BigDecimal calculateOrderTotal(OrderDto orderDto) {
-        //TODO
-        return null;
+        Map<UUID, BigDecimal> prices = shoppingStoreClient.getProductPrices(
+                new ArrayList<>(orderDto.getProducts().keySet())
+        );
+
+        return orderDto.getProducts().entrySet().stream()
+                .map(entry -> prices.get(entry.getKey())
+                        .multiply(BigDecimal.valueOf(entry.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void failedPayment(UUID paymentId) {
         Payment payment = repository.findById(paymentId).orElseThrow(() -> new NotFoundException("Оплата не найдена"));
         payment.setStatus(PaymentStatus.FAILED);
+        orderClient.paymentFailed(payment.getOrderId());
     }
 
 
