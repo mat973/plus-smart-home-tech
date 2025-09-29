@@ -17,32 +17,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class DeliveryController implements DeliveryClient {
-   private final DeliveryService service;
+    private final DeliveryService service;
+
     @PutMapping
-    public DeliveryDto createOrder(@Valid @RequestBody DeliveryDto deliveryDto){
+    public DeliveryDto createOrder(@Valid @RequestBody DeliveryDto deliveryDto) {
         log.info("Запрос на создание доставки {}", deliveryDto);
         return service.createOrder(deliveryDto);
     }
+
     @PostMapping("/successful")
-    public void successfulDelivery(@RequestBody UUID deliveryId){
+    public void successfulDelivery(@RequestBody UUID deliveryId) {
         log.info("Запрос на изменение статуса заказа c id {} на успешное", deliveryId);
         service.successfulDelivery(deliveryId);
     }
 
     @PostMapping("/picked")
-    public void pickedDelivery(@RequestBody UUID deliveryId){
+    public void pickedDelivery(@RequestBody UUID deliveryId) {
         log.info("Запрос на изменение статуса заказа c id {} на принято в работу", deliveryId);
         service.pickedDelivery(deliveryId);
     }
 
     @PostMapping("/failed")
-    public void failedDelivery(@RequestBody UUID deliveryId){
+    public void failedDelivery(@RequestBody UUID deliveryId) {
         log.info("Запрос на изменение статуса заказа c id {} на неудачная доставка", deliveryId);
         service.failedDelivery(deliveryId);
     }
 
     @PostMapping("/cost")
-    public BigDecimal costDelivery(@Valid @RequestBody OrderDto orderDto){
+    public BigDecimal costDelivery(@Valid @RequestBody OrderDto orderDto) {
         log.info("Расчет стоимости заказа {}", orderDto);
         return service.costDelivery(orderDto);
     }

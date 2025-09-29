@@ -16,7 +16,7 @@ import ru.yandex.practicum.dto.feign.client.WarehouseClient;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
-import ru.yandex.practicum.dto.order.State;
+import ru.yandex.practicum.dto.order.OrderStateDto;
 import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exceptions.NoOrderFoundException;
@@ -62,7 +62,7 @@ public class OrderService {
         Order order = Order.builder()
                 .shoppingCartId(request.getShoppingCart().getShoppingCartId())
                 .products(request.getShoppingCart().getProducts())
-                .state(State.NEW)
+                .orderStateDto(OrderStateDto.NEW)
                 .build();
         Order savedOrder = orderRepository.save(order);
 
@@ -99,38 +99,38 @@ public class OrderService {
                 .orElseThrow(() -> new NoOrderFoundException(MESSAGE_ORDER_NOT_FOUND));
 
         warehouseClient.returnedProduct(request.getProducts());
-        order.setState(State.PRODUCT_RETURNED);
+        order.setOrderStateDto(OrderStateDto.PRODUCT_RETURNED);
 
         return orderMapper.toOrderDto(order);
     }
 
     public OrderDto payment(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.PAID);
+        order.setOrderStateDto(OrderStateDto.PAID);
         return orderMapper.toOrderDto(order);
     }
 
     public OrderDto paymentFailed(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.PAYMENT_FAILED);
+        order.setOrderStateDto(OrderStateDto.PAYMENT_FAILED);
         return orderMapper.toOrderDto(order);
     }
 
     public OrderDto delivery(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.DELIVERED);
+        order.setOrderStateDto(OrderStateDto.DELIVERED);
         return orderMapper.toOrderDto(order);
     }
 
     public OrderDto deliveryFailed(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.DELIVERY_FAILED);
+        order.setOrderStateDto(OrderStateDto.DELIVERY_FAILED);
         return orderMapper.toOrderDto(order);
     }
 
     public OrderDto complete(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.COMPLETED);
+        order.setOrderStateDto(OrderStateDto.COMPLETED);
         return orderMapper.toOrderDto(order);
     }
 
@@ -148,13 +148,13 @@ public class OrderService {
 
     public OrderDto assembly(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.ASSEMBLED);
+        order.setOrderStateDto(OrderStateDto.ASSEMBLED);
         return orderMapper.toOrderDto(order);
     }
 
     public OrderDto assemblyFailed(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
-        order.setState(State.ASSEMBLY_FAILED);
+        order.setOrderStateDto(OrderStateDto.ASSEMBLY_FAILED);
         return orderMapper.toOrderDto(order);
     }
 

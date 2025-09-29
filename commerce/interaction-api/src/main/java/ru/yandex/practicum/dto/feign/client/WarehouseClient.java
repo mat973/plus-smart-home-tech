@@ -26,7 +26,6 @@ public interface WarehouseClient {
     @GetMapping("/api/v1/warehouse/address")
     AddressDto getCurrentWarehouseAddress();
 
-
     @PostMapping("/api/v1/warehouse/return")
     void returnedProduct(@RequestBody Map<UUID, Long> returnedProducts);
 

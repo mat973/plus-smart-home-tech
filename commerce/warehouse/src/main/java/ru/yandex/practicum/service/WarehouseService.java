@@ -54,7 +54,6 @@ public class WarehouseService {
         updateProductQuantityInShoppingStore(product);
     }
 
-
     @Transactional(readOnly = true)
     public BookedProductsDto checkProductState(ShoppingCartDto cartDto) {
         Map<UUID, Long> products = cartDto.getProducts();
@@ -103,7 +102,6 @@ public class WarehouseService {
         log.info("Заказ {} отправлен в доставку {}", request.getOrderId(), request.getDeliveryId());
     }
 
-
     @Transactional
     public void returnedProduct(Map<UUID, Long> returnedProducts) {
         List<WarehouseProduct> products = repository.findAllById(returnedProducts.keySet());
@@ -115,7 +113,6 @@ public class WarehouseService {
             }
         }
     }
-
 
     @Transactional
     public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
@@ -162,7 +159,6 @@ public class WarehouseService {
         return dto;
     }
 
-
     private BookedProductsDto getBookedProducts(Collection<WarehouseProduct> products, Map<UUID, Long> quantities) {
         double totalWeight = products.stream()
                 .mapToDouble(p -> p.getWeight() * quantities.get(p.getProductId()))
@@ -184,10 +180,16 @@ public class WarehouseService {
         QuantityState quantityState;
         Long qty = product.getQuantity();
 
-        if (qty == 0) quantityState = QuantityState.ENDED;
-        else if (qty < 10) quantityState = QuantityState.ENOUGH;
-        else if (qty < 100) quantityState = QuantityState.FEW;
-        else quantityState = QuantityState.MANY;
+        if (qty == 0) {
+            quantityState = QuantityState.ENDED;
+        } else if
+        (qty < 10) {
+            quantityState = QuantityState.ENOUGH;
+        } else if (qty < 100) {
+            quantityState = QuantityState.FEW;
+        } else {
+            quantityState = QuantityState.MANY;
+        }
 
         shoppingStoreClient.changeQuantityState(productId, quantityState);
     }

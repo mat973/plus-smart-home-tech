@@ -97,7 +97,7 @@ services:
 
   order-db:
     image: postgres:16.1
-    container_name: postgres-cart
+    container_name: postgres-order
     ports:
       - "9432:5432"
     environment:
@@ -112,7 +112,7 @@ services:
 
   payment-db:
     image: postgres:16.1
-    container_name: postgres-cart
+    container_name: postgres-payment
     ports:
       - "8332:5432"
     environment:
@@ -127,7 +127,7 @@ services:
 
   delivery-db:
     image: postgres:16.1
-    container_name: postgres-cart
+    container_name: postgres-delivery
     ports:
       - "9332:5432"
     environment:

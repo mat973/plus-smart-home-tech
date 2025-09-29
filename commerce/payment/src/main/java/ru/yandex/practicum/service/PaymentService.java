@@ -67,7 +67,4 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.FAILED);
         orderClient.paymentFailed(payment.getOrderId());
     }
-
-
-
 }

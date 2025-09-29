@@ -11,5 +11,6 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 public interface DeliveryMapper {
 
     Delivery toDelivery(DeliveryDto deliveryDto);
+
     DeliveryDto toDeliveryDto(Delivery delivery);
 }

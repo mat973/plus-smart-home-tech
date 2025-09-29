@@ -3,6 +3,8 @@ package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,17 +42,10 @@ public class Payment {
     @Column(nullable = false, length = 20)
     private PaymentStatus status;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
+    @UpdateTimestamp
+    @CreationTimestamp
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }

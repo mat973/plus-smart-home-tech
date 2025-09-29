@@ -22,5 +22,5 @@ public class DeliveryDto {
     @NotNull
     private UUID orderId;
     @NotNull
-    private State deliveryState;
+    private DeliveryStateDto deliveryDeliveryStateDto;
 }

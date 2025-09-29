@@ -22,13 +22,11 @@ public class OrderDto {
     private Map<UUID, Integer> products;
     private UUID paymentId;
     private UUID deliveryId;
-    private State state;
+    private OrderStateDto orderStateDto;
     private Double deliveryWeight;
     private Double deliveryVolume;
     private Boolean fragile;
     private BigDecimal totalPrice;
     private BigDecimal deliveryPrice;
     private BigDecimal productPrice;
-
-
 }

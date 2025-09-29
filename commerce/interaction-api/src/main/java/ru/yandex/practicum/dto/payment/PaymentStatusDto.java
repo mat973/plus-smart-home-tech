@@ -1,5 +1,5 @@
 package ru.yandex.practicum.dto.payment;
 
-public enum Status {
+public enum PaymentStatusDto {
     PENDING, SUCCESS, FAILED
 }

@@ -1,5 +1,5 @@
 package ru.yandex.practicum.model;
 
-public enum State {
+public enum DeliveryState {
     CREATED, IN_PROGRESS, DELIVERED, FAILED, CANCELLED
 }

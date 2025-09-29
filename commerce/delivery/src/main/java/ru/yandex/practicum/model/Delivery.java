@@ -42,5 +42,5 @@ public class Delivery {
 
     private UUID orderId;
     @Enumerated(EnumType.STRING)
-    private State deliveryState;
+    private DeliveryState deliveryState;
 }

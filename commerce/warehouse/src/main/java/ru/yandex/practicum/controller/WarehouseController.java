@@ -20,22 +20,22 @@ public class WarehouseController implements WarehouseClient {
     private final WarehouseService service;
 
     @PutMapping
-    public void createProduct(@RequestBody @Valid NewProductInWarehouseRequest request){
-            service.createProduct(request);
+    public void createProduct(@RequestBody @Valid NewProductInWarehouseRequest request) {
+        service.createProduct(request);
     }
 
     @PostMapping("/check")
-    public BookedProductsDto checkProductState(@RequestBody @Valid ShoppingCartDto cartDto){
+    public BookedProductsDto checkProductState(@RequestBody @Valid ShoppingCartDto cartDto) {
         return service.checkProductState(cartDto);
     }
 
     @PostMapping("/add")
-    public  void addQuantityProductToWarehouse(@RequestBody AddProductToWarehouseRequest request){
+    public void addQuantityProductToWarehouse(@RequestBody AddProductToWarehouseRequest request) {
         service.addQuantityProductToWarehouse(request);
     }
 
     @GetMapping("/address")
-    public AddressDto getCurrentWarehouseAddress(){
+    public AddressDto getCurrentWarehouseAddress() {
         return service.getCurrentWarehouseAddress();
     }
 
