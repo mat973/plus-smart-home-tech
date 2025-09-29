@@ -6,7 +6,9 @@ import org.mapstruct.MappingTarget;
 import ru.yandex.practicum.dto.product.ProductDto;
 import ru.yandex.practicum.model.Product;
 
-@Mapper(componentModel = "spring")
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+
+@Mapper(componentModel = SPRING)
 public interface ProductMapper {
 
     @Mapping(target = "productId", ignore = true)

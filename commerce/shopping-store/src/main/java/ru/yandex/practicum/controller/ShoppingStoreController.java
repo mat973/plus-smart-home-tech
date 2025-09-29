@@ -12,6 +12,9 @@ import ru.yandex.practicum.dto.product.QuantityState;
 import ru.yandex.practicum.dto.product.SetProductQuantityStateRequest;
 import ru.yandex.practicum.service.ProductService;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -59,6 +62,12 @@ public class ShoppingStoreController {
     public ProductDto getProductById(@PathVariable UUID productId) {
         log.info("Получение информация о прод куте по id: {}", productId);
         return productService.getProductById(productId);
+    }
+
+    @PostMapping("/prices")
+    public Map<UUID, BigDecimal> getProductPrices(@RequestBody List<UUID> productIds) {
+        log.info("Запрос цен для продуктов: {}", productIds);
+        return productService.getProductPrices(productIds);
     }
 
 
